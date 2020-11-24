@@ -65,7 +65,7 @@ const getWarehousesForCustomer = (request, response) => {
 
 //also first check whether user can view this warehouse
 const getAllSensorsForWarehouse = (request, response) => {
-    const collection = request.mongodb.collection("sensors");
+    const collection = request.mongodb.collection("sensor");
     collection.find({warehouse_id: request.params.id}).toArray(function (err, docs) {
         if(err){
             console.log(err);
