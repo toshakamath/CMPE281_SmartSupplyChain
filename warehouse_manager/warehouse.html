@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>CMPE281 Project</title>
+
+  <!-- Bootstrap core CSS -->
+  <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="index.css">
+
+  <!-- Custom fonts for this template -->
+  <link href="https://fonts.googleapis.com/css?family=Raleway:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Lora:400,400i,700,700i" rel="stylesheet">
+
+  <!-- Custom styles for this template -->
+  <link href="css/business-casual.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+</head>
+
+<body>
+
+  <h1 class="site-heading text-center text-white d-none d-lg-block">
+    <span class="site-heading-upper text-primary mb-3">Warehouse Manager</span>
+    <span class="site-heading-lower">Demo</span>
+  </h1>
+
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark py-lg-4" id="mainNav">
+    <div class="container">
+      <a class="navbar-brand text-uppercase text-expanded font-weight-bold d-lg-none" href="#">Start Bootstrap</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav mx-auto">
+          <li class="nav-item px-lg-4">
+            <a class="nav-link text-uppercase text-expanded" href="about.html">Home</a>
+          </li>
+          <li class="nav-item active px-lg-4">
+            <a class="nav-link text-uppercase text-expanded" href="warehouse.html">Warehouse</a>
+          </li>
+          <li class="nav-item px-lg-4">
+            <a class="nav-link text-uppercase text-expanded" href="sensor.html">Sensor</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <section class="page-section about-heading">
+    <div class="container">
+      <img class="img-fluid rounded about-heading-img mb-3 mb-lg-0" src="img/about.jpg" alt="">
+      <div class="about-heading-content">
+        <div class="row">
+          <div class="col-xl-9 col-lg-10 mx-auto">
+            <div id="warehouselist" class="bg-faded rounded p-5">
+              <h2 class="section-heading mb-4">
+                <span class="section-heading-upper">Warehouse Manager</span>
+              </h2>
+
+
+              <h4>Derek's Warehouses</h4>
+              <div id="warehouselist2">
+              </div>
+              <br><br>
+              <div>
+                <button id="addW">Add Warehouse</button>
+                <button id="editW">Edit Warehouse</button>
+                <button id="deleteW">Delete Warehouse</button>
+                <button id="sensorsW">Sensors</button>
+              </div>
+
+              <br>
+
+              <div id="addwarehousediv">
+
+                Warehouse Name: <input type="text" id="addname" name="fname"><br><br>
+                City: <input type="text" id="addcity" name="lname"><br><br>
+                Cargo Amount: <input type="number" id="addcargo" name="lname"><br><br>
+                Schedule (seconds): <input type="number" id="addschedule" name="lname"><br><br>
+                
+                <input id="addwareSubmit" type="submit" value="Add">
+              </div>
+
+
+              <div id="deletewarehousediv">
+
+                WarehouseID: <input type="text" id="deleteid" name="fname"><br><br>
+                <input id="deletewareSubmit" type="submit" value="Delete">
+
+              </div>
+
+              <div id="editwarehousediv">
+                Warehouse ID: <input type="text" id="editid" name="fname"> <br><br>
+                Schedule (seconds): <input type="number" id="warescheduleid" name="fname">
+                <input id="editwarescheduleSubmit" type="submit" value="Edit Schedule"> <br><br>
+                Status: <input type="text" id="warestatusid" name="fname">
+                <input id="editwarestatusSubmit" type="submit" value="Edit Status"> <br><br>
+                Cargo: <input type="number" id="warecargoid" name="fname">
+                <input id="editwarecargoSubmit" type="submit" value="Edit Cargo">                   
+              </div>
+
+              <div id="sensorsdiv">
+                Warehouse ID: <input type="text" id="getsensorsid" name="fname"> 
+                <input id="getsensorsbywarehouse" type="submit" value="Get Sensors"> <br><br>
+
+              </div>
+  
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer text-faded text-center py-5">
+    <div class="container">
+      <p class="m-0 small">Derek Gao CMPE281 Fall 2020 Demo</p>
+    </div>
+  </footer>
+
+  <!-- Bootstrap core JavaScript -->
+  <script src="vendor/jquery/jquery.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="index.js" charset="utf-8"></script>
+
+</body>
+
+</html>

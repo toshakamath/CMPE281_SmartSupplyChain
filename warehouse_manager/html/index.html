@@ -1,0 +1,85 @@
+<h2>API List</h2>
+
+http://ec2-3-133-149-242.us-east-2.compute.amazonaws.com:4000
+
+<br>
+<br>
+
+<h3>POST</h3>
+
+/addwarehouse
+{"name":"Warehouse1", "owner": "Derek", "city": "San Jose", "longitude": 388384, "latitude": 304959, "cargoamount": 40, "schedule": 6000}
+<br>
+<br>
+
+
+/removewarehouse
+{"warehouseID:"}
+
+<br>
+<br>
+
+/updatewarehouseschedule
+{"warehouseID": , "schedule":}
+
+<br>
+<br>
+
+/updatewarehousenodestatus
+{"warehouseID": , "status":}
+
+<br>
+<br>
+
+/addsensor
+{"warehouseID":, "sensortype": "humidity"}
+//sensor type is either "humidity" or "light" or "temperature"
+
+<br>
+<br>
+
+/updatesensorstatus
+{"sensorID": , "status":}
+
+
+<br>
+<br>
+
+<h3>GET</h3>
+
+
+/getallwarehousemetadata
+<br>
+<br>
+
+
+/getsinglewarehousemetadata
+{"warehouseID":}
+<br>
+<br>
+
+
+/getwarehousemetadatabyuser
+{"username":}
+<br>
+<br>
+
+
+/getallsensormetadata
+
+<br>
+<br>
+
+/getsensormetadatabywarehouse
+{"warehouseID":}
+
+<br>
+<br>
+
+/getallsensordata
+<br>
+<br>
+
+
+/getsensordatabywarehouse
+{"warehouseID":}

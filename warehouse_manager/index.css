@@ -1,0 +1,25 @@
+table, th, td {
+  border: 1px solid black;
+  border-spacing: 1em;
+  text-align: center;
+}
+
+
+
+
+td {
+	text-align: center;
+}
+
+button {
+
+	margin-right: 3%;
+}
+
+#addwarehousediv, #deletewarehousediv, #ediwarehousediv, #sensorsdiv {
+	display: none;
+} 
+
+#seeSensorData, #editSensors {
+	display: none;
+}
