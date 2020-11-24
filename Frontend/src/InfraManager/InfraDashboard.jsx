@@ -305,7 +305,7 @@ class InfraDashboard extends React.Component {
                                             <ButtonGroup>
                                                 <Button color="primary" onClick={this.modalToggle}>Add</Button>
                                                 <Button color="danger" onClick={this.deleteToggle}>Delete</Button>
-                                                <Button color="info" onClick={this.backToCustomer}>Go Back</Button>
+                                                <Button color="info" onClick={this.backToCustomer}>Back</Button>
                                             </ButtonGroup>
                                         </Col>
                                         </Row>

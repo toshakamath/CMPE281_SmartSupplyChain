@@ -290,7 +290,7 @@ class SupportDashboard extends React.Component {
                                                 <h2>List of Warehouses</h2>
                                             </Col>
                                             <Col md="4">
-                                            <Button color="info" onClick={this.backToCustomer}>Go Back</Button>
+                                            <Button color="info" onClick={this.backToCustomer}>Back</Button>
                                         </Col>
                                         </Row>
                                         <CustomTable 
