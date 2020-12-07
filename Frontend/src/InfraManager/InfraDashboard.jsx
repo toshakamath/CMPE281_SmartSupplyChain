@@ -39,7 +39,8 @@ class InfraDashboard extends React.Component {
     componentDidMount() {
         const role = localStorage.getItem('user');
         this.getAllUsers();
-        this.grabAllWarehouse();
+        // this.grabAllWarehouse();
+        this.getAllWarehouses();
     }
 
     getAllUsers = () =>{
@@ -50,7 +51,7 @@ class InfraDashboard extends React.Component {
           console.log("response: ", res.data);
           let cust = []
           res.data.users.forEach((customer) => {
-            let tmp = [customer.name, customer.warehouse_id.length];
+            let tmp = [customer.name, JSON.parse(customer.warehouse_id).length, customer.email];
             cust.push(tmp);
             });
             this.setState({
@@ -62,20 +63,20 @@ class InfraDashboard extends React.Component {
         });
     }
 
-    grabAllWarehouse = () => {
-        let warehouses = []
-        customerJson.forEach((customer) => {
-            let tmp = customer.warehouses.map((ware) => {
-                ware.customer = customer.name;
-                return ware;
-            });
-            console.log(tmp);
-            warehouses = warehouses.concat(tmp);
-        });
+  getAllWarehouses = () => {
+    console.log("Inside getAllWarehouses!");
+    axios
+    .get(`http://localhost:3001/warehouses`)
+      .then((res) => {
+        console.log("response: ", res.data);
         this.setState({
-            markerData: warehouses
+          markerData: res.data.warehouses,
         });
-    }
+      })
+      .catch((err) => {
+        console.log("error in getting all users from mysql: ", err);
+      });
+  };
 
     // need list of longitude and latitude to define marker locations
     searchWarehouse = (e) => {
@@ -86,7 +87,7 @@ class InfraDashboard extends React.Component {
             lng: -1
         };
         this.state.markerData.forEach((ware) => {
-            if (this.state.searchBarValue === ware.state ) {
+            if ( ware.address.toLowerCase().includes(this.state.searchBarValue.toLowerCase())) {
                 // zoom in
                 loc = ware.location;
             }
@@ -115,38 +116,28 @@ class InfraDashboard extends React.Component {
         });
     }
 
-    handleCustomerRowClick = (e, r) => {
-        // handle clicking a row
-        // condition check to see if row is for individual warehouse or for everything
-        // clicking orders won't do anything
-
-        // setup table
+  handleCustomerRowClick = (e, r) => {
+    e.preventDefault();
+    console.log("Inside handleCustomerRowClick!", r);
+    axios
+      .get(`http://localhost:3001/warehouse/user/${r[2]}`)
+      .then((res) => {
+        console.log("response: ", res.data);
         let customer_data = [];
-        customerJson.forEach((customer) => {
-            if (customer.name === r[0]) {
-                customer_data = customer.warehouses.map((ware) => {
-                    return [ware.name, ware.orders, ware.state, ware.status];
-                });
-            }
-        });
-
-        //setup customer markers
-        let customer_marker = [];
-        customerJson.forEach((customer) => {
-            if (customer.name === r[0]) {
-                customer_marker = customer.warehouses.map((ware) => {
-                    return ware;
-                });
-            }
-        });
-
+            customer_data = res.data.warehouses.map((ware) => {
+              return [ware.name, ware.orders, ware.address, ware.warehouse_status];
+            });
         this.setState({
-            isCustomerView: !this.state.isCustomerView,
+          markerData: res.data.warehouses,
+          isCustomerView: !this.state.isCustomerView,
             selectedCustomer: r[0],
             table_data: customer_data,
-            markerData: customer_marker
         });
-    }
+      })
+      .catch((err) => {
+        console.log("error in getting all users from mysql: ", err);
+      });
+  }
 
     handleWarehouseRowClick = (e, r) =>{
         // handle the warehouse row click
