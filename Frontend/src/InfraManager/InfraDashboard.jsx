@@ -9,6 +9,7 @@ import CustomTable from "../common/CustomTable.jsx";
 import { Map, InfoWindow, Marker, GoogleApiWrapper} from 'google-maps-react';
 import { withRouter } from "react-router-dom";
 import customerJson from '../mock_data/customer';
+import axios from 'axios';
 
 class InfraDashboard extends React.Component {
     constructor(props) {
@@ -37,8 +38,28 @@ class InfraDashboard extends React.Component {
 
     componentDidMount() {
         const role = localStorage.getItem('user');
-        this.grabCustomer();
+        this.getAllUsers();
         this.grabAllWarehouse();
+    }
+
+    getAllUsers = () =>{
+        console.log("Inside getAllUsers!");
+        axios
+        .get(`http://localhost:3001/users`)
+        .then((res) => {
+          console.log("response: ", res.data);
+          let cust = []
+          res.data.users.forEach((customer) => {
+            let tmp = [customer.name, customer.warehouse_id.length];
+            cust.push(tmp);
+            });
+            this.setState({
+                customerTable: cust
+            });
+        })
+        .catch((err) => {
+          console.log("error in getting all users from mysql: ",err);
+        });
     }
 
     grabAllWarehouse = () => {
@@ -78,17 +99,6 @@ class InfraDashboard extends React.Component {
                 centerLocation: loc
             });
         }
-    }
-
-    grabCustomer = () =>  {
-        let cust = []
-        customerJson.forEach((customer) => {
-            let tmp = [customer.name, customer.warehouses.length];
-            cust.push(tmp);
-        });
-        this.setState({
-            customerTable: cust
-        });
     }
 
     modalToggle = (e) => {
