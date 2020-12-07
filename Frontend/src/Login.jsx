@@ -10,6 +10,7 @@ import {
   Button,
   Row,
 } from "reactstrap";
+import axios from 'axios';
 
 class Login extends React.Component {
   constructor(props) {
@@ -33,24 +34,30 @@ class Login extends React.Component {
     }
   };
   submitLogin = (e) => {
-    const json = {
-      support: "1234",
-      manager: "1234",
-      supplier: "1234",
-    };
-    // run authentication
     e.preventDefault();
-    if (json[this.state.username] === this.state.pass) {
-      if (this.state.username === "support") {
-        localStorage.setItem("user", "support");
-      } else if (this.state.username === "manager") {
-        localStorage.setItem("user", "manager");
-      } else {
-        localStorage.setItem("user", "supplier");
-      }
-      console.log("redirect...");
-      this.props.history.push("/");
+    console.log("Inside submitLogin!");
+    let data ={
+      "email":this.state.username,
+      "password":this.state.pass
     }
+    axios
+      .post(`http://localhost:3001/login`, data)
+      .then((res) => {
+        console.log("response: ", res.data);
+        if (res.data.status === "success") {
+            localStorage.setItem("user", res.data.details.role);
+            localStorage.setItem("email", res.data.details.email);
+            console.log("redirect...");
+            this.props.history.push("/");
+        }
+        else{
+          console.log("wrong user.. redirect...");
+          localStorage.clear();
+        }
+      })
+      .catch((err) => {
+        console.log("error authorizing user from mysql: ", err);
+      });
   };
 
   render() {
