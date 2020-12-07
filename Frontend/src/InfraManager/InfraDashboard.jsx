@@ -266,8 +266,8 @@ class InfraDashboard extends React.Component {
                                                             }
                                                             <Col>
                                                                 <Badge 
-                                                                    color={this.state.selectedMarkerInfo.status === "error" ? 
-                                                                    "danger" : "success"}>
+                                                                    color={this.state.selectedMarkerInfo.status.toLowerCase() === "operational" ? 
+                                                                    "success" : "danger"}>
                                                                     {this.state.selectedMarkerInfo.status}
                                                                 </Badge>
                                                             </Col>

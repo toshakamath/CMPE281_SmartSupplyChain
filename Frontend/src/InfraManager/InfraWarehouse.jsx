@@ -52,6 +52,7 @@ class SupportWarehouse extends React.Component {
       individualSensorId: null,
       manageSensorModal: false,
       deleteToggle: false,
+      orderModal: false
     };
   }
 
@@ -168,7 +169,11 @@ class SupportWarehouse extends React.Component {
             }
 
             const chart_data = [];
+            const history_data = [];
             sen.history.forEach((dt) => {
+              if (history_data.length < 6) {
+                history_data.push(dt);
+              }
               let tmp = { name: "", generic: "" };
               let x = dt[0].split("-");
               tmp.name = x[1];
@@ -196,7 +201,7 @@ class SupportWarehouse extends React.Component {
                     <CustomTable
                       title="History"
                       header={header}
-                      trows={sen.history}
+                      trows={history_data}
                       handleRowClick={this.handleRowClick}
                     />
                     <Pagination>
@@ -260,8 +265,7 @@ class SupportWarehouse extends React.Component {
                 >
                   <option value="temperature">Temperature</option>
                   <option value="humidity">Humidity</option>
-                  <option value="uv">UV</option>
-                  <option value="wind">Wind</option>
+                  <option value="uv">Light</option>
                 </Input>
               </FormGroup>
               {this.state.addSensor.sensorType === "temperature" ? (
@@ -277,15 +281,6 @@ class SupportWarehouse extends React.Component {
                   </Input>
                 </FormGroup>
               ) : null}
-              <FormGroup>
-                <Label for="examplePassword">Threshold</Label>
-                <Input
-                  type="password"
-                  name="password"
-                  id="examplePassword"
-                  placeholder=""
-                />
-              </FormGroup>
               <ModalFooter>
                 <Button
                   color="primary"

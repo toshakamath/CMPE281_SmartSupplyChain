@@ -62,12 +62,26 @@ class Warehouse extends React.Component {
       orderHistory: warehouseJSON[0].history,
       deleteToggle: false,
       perPage: 5,
+      warehouse: []
     };
   }
 
   componentDidMount() {
     // console.log(this.props.location.state.warehouseId);
     console.log(this.state.warehouseId);
+    // customerJson[0].warehouses[0].sensor.forEach((d) => {
+    //   let tmp = [];
+    //   let cnt = 1;
+    //   d.history.forEach((hist) => {
+    //     if (tmp.length <= 5) {
+    //       tmp.push(hist);
+    //     } else {
+
+    //     }
+    //     console.log(hist);
+    //   });
+    //   console.log(d);
+    // })
 
     // make call to grab all sensor data from the selected warehouse
     // default detailed warehouse is first on the list
@@ -221,13 +235,19 @@ class Warehouse extends React.Component {
             }
 
             const chart_data = [];
+            const history_data = [];
             sen.history.forEach((dt) => {
+              if (history_data.length < 6) {
+                history_data.push(dt);
+              }
               let tmp = { name: "", generic: "" };
               let x = dt[0].split("-");
               tmp.name = x[1];
               tmp.generic = dt[1];
               chart_data.push(tmp);
             });
+
+            console.log(chart_data);
 
             return (
               <Col className="pb-4" xs="auto" md="4">
@@ -249,7 +269,7 @@ class Warehouse extends React.Component {
                     <CustomTable
                       title="History"
                       header={header}
-                      trows={sen.history}
+                      trows={history_data}
                       handleRowClick={this.handleRowClick}
                     />
                     <Pagination>
@@ -405,7 +425,7 @@ class Warehouse extends React.Component {
                 >
                   <option value="temperature">Temperature</option>
                   <option value="humidity">Humidity</option>
-                  <option value="uv">UV</option>
+                  <option value="uv">Light</option>
                 </Input>
               </FormGroup>
               {this.state.addSensor.sensorType === "temperature" ? (
