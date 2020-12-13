@@ -1,4 +1,4 @@
-const tableName = "smartsupplychain_db.users";
+const tableName = "sql3381783.users";
 
 let login = (request, response) => {
   console.log("request.BODY: ", request.body);

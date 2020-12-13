@@ -1,5 +1,5 @@
 ObjectId = require('mongodb').ObjectID
-const tableName = "smartsupplychain_db.users";
+const tableName = "sql3381783.users";
 
 const getAllWarehouses = (request, response) => {
     const collection = request.mongodb.collection("warehouse");

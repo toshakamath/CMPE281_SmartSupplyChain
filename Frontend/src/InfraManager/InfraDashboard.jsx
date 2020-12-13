@@ -233,8 +233,8 @@ class InfraDashboard extends React.Component {
                                 {
                                     this.state.markerData.map(
                                         (obj, index) => {
-                                            let lat = parseFloat(obj.location.lat, 10);
-                                            let lng = parseFloat(obj.location.lng, 10);
+                                            let lat = parseFloat((obj.location||{}).lat||"", 10);
+                                            let lng = parseFloat((obj.location||{}).lng||"", 10);
                                             return(
                                                 <Marker
                                                     key={index}
