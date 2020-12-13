@@ -1,4 +1,4 @@
-const tableName = "smartsupplychain_db.users";
+const tableName = "sql3381783.users";
 
 let login = (request, response) => {
   console.log("request.BODY: ", request.body);
@@ -12,7 +12,8 @@ let login = (request, response) => {
         response.json({ status: "error", reason: "user not found" });
       } else {
         console.log(result[0]);
-        response.json({ status: "success", reason: "logged in successfully" });
+        delete result[0].password
+        response.json({ status: "success", reason: "logged in successfully", details:result[0] });
       }
     }
   });

@@ -36,9 +36,6 @@ import { Table } from 'reactstrap';
                                 <tr onClick={(e) => this.props.handleRowClick(e, r)}>
                                     <td>{r[0]}</td>
                                     <td>{r[1]}</td>
-                                    <td>{r[2]}</td>
-                                    <td>{r[3]}</td>
-                                    <td>{r[4]}</td>
                                 </tr>);
                             })
                         }
