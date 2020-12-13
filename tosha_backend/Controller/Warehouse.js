@@ -39,9 +39,9 @@ const getWarehousesForCustomer = (request, response) => {
             else{
                 let warehouseArray = JSON.parse(result[0].warehouse_id)
                 warehouseArray = warehouseArray.map((e)=>{
-                    return ObjectId(e);
+                    return e;
                 })
-                collection.find({"_id":{$in: warehouseArray}}).toArray(function (err, docs) {
+                collection.find({"warehouse_id":{$in: warehouseArray}}).toArray(function (err, docs) {
                     if(err){
                         console.log(err);
                         response.json({ status: "error", reason: err });
