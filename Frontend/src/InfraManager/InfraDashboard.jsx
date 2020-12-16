@@ -427,12 +427,12 @@ class InfraDashboard extends React.Component {
                                         }
                                     </Input>
                                 </FormGroup>
+                                <ModalFooter>
+                                    <Button color="danger" type="submit">Delete</Button>{' '}
+                                    <Button color="primary" onClick={this.deleteToggle}>Cancel</Button>
+                                </ModalFooter>
                             </Form>
                         </ModalBody>
-                        <ModalFooter>
-                            <Button color="danger" type="submit">Delete</Button>{' '}
-                            <Button color="primary" onClick={this.deleteToggle}>Cancel</Button>
-                        </ModalFooter>
                     </Modal>
 
                     <Modal isOpen={this.state.modal} toggle={this.modalToggle}>
@@ -484,6 +484,10 @@ class InfraDashboard extends React.Component {
                                     placeholder="0"
                                     />
                                 </FormGroup>
+                                <ModalFooter>
+                                    <Button color="primary" type="submit">Add</Button>{' '}
+                                    <Button color="danger" onClick={this.modalToggle}>Cancel</Button>
+                                </ModalFooter>
                             </Form>
                         </ModalBody>
                         <ModalFooter>
