@@ -15,6 +15,70 @@ var sqlite = require("better-sqlite3");
 var db = new sqlite("bankdatabase.db");
 
 
+/*
+//setup MongoDB database connection according to tosha file
+var MongoClient = require('mongodb').MongoClient;
+const url = "mongodb+srv://root:root@cluster0.uymh0.mongodb.net/smartsupplychain_db?retryWrites=true&w=majority";
+const dbName = 'smartsupplychain_db';
+
+MongoClient.connect(url, function(err, client) {
+    if(err){
+        console.log(err);
+        throw err;
+    }
+    console.log("Connected successfully to mongodb!");
+    const db = client.db(dbName);
+    cb(null, db);
+  });
+*/
+
+
+
+const MongoClient = require('mongodb').MongoClient;
+const uri = "mongodb+srv://root:root@cluster0.uymh0.mongodb.net/smartsupplychain_db?retryWrites=true&w=majority";
+const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true});
+
+client.connect(err => {
+ 
+  console.log("client.connect testing");
+  
+});
+/*
+client.connect(err => {
+  const collection = client.db("smartsupplychain_db").collection("warehouse");
+  console.log("client.connect testing");
+  collection.insertOne({name: 'testing'}, (err, result) => {console.log(err);});
+
+  // perform actions on the collection object
+  client.close();
+});
+*/
+
+
+
+//MySQL Connection
+const mysql = require("mysql");
+const tableName = "sql3381783.users";
+
+const con = mysql.createConnection({
+    host: "sql3.freemysqlhosting.net",
+    port: "3306",
+    user: "sql3381783",
+    password: "TvKJIBNSCB"
+  });
+
+
+/*
+  con.connect(function (err) {
+    if (err) throw err;
+    console.log("Connected successfully to mysql!");
+  });
+*/
+
+
+
+
+
 
 
 // Set up the path for the quickstart.
@@ -126,6 +190,7 @@ app.post('/addsensor', function(req, res){
 
 	var ind = FindWarehouseSmartNodePosition(addSensorRequest.warehouseID);
 
+
 	if (ind > -1) {
 
 		var newSensorID = generateID(6);
@@ -133,19 +198,26 @@ app.post('/addsensor', function(req, res){
 		if (addSensorRequest.sensortype == "light") {
 
 			ArrayOfSmartNodes[ind].sensorList.push(new SensorClass.LightSensor(newSensorID));
+			var sensorJSON = {"sensor_id": newSensorID, "sensor_type": addSensorRequest.sensortype, "sensor_unit": "Lux", "warehouse_id": addSensorRequest.warehouseID, "sensor_status": "Active"};
 
 		} else if (addSensorRequest.sensortype == "temperature") {
 
 			ArrayOfSmartNodes[ind].sensorList.push(new SensorClass.TemperatureSensor(newSensorID));
+			var sensorJSON = {"sensor_id": newSensorID, "sensor_type": addSensorRequest.sensortype, "sensor_unit": "Fahrenheit", "warehouse_id": addSensorRequest.warehouseID, "sensor_status": "Active"};
 
 		} else if (addSensorRequest.sensortype == "humidity") {
 
 			ArrayOfSmartNodes[ind].sensorList.push(new SensorClass.HumiditySensor(newSensorID));
+			var sensorJSON = {"sensor_id": newSensorID, "sensor_type": addSensorRequest.sensortype, "sensor_unit": "RH (%)", "warehouse_id": addSensorRequest.warehouseID, "sensor_status": "Active"};
 
 		};
 
-		addWarehouseSensor.run(newSensorID, addSensorRequest.warehouseID, addSensorRequest.sensortype, "Active");
+		//for SQLlite
+		//addWarehouseSensor.run(newSensorID, addSensorRequest.warehouseID, addSensorRequest.sensortype, "Active");
 
+		//for mongoDB
+		var collection = client.db("smartsupplychain_db").collection("sensor");
+		collection.insertOne(sensorJSON, (err, result) => {console.log(err);});
 
 		var message = "Successfully added " + addSensorRequest.sensortype + " sensor with ID: " + newSensorID + ".";
 
@@ -172,9 +244,20 @@ app.post('/addsensor', function(req, res){
 app.post('/updatesensorstatus', function(req, res){
 
 	console.log(req.body);
-
 	var sensorStatusRequest = req.body;
 
+
+	var myQuery = {"sensor_id": sensorStatusRequest.sensorID};
+	var newValues = { $set: { sensor_status: sensorStatusRequest.status } };
+	var collection = client.db("smartsupplychain_db").collection("sensor");
+	collection.updateOne(myQuery, newValues, (err, result) => {console.log(err);});
+
+	var ind = FindWarehousePositionBySensorID(_sensorID);
+	var ind2 = ArrayOfSmartNodes[ind].findSensorPositionInSensorList(sensorStatusRequest.sensorID);
+	ArrayOfSmartNodes[ind].sensorList[ind2].status = sensorStatusRequest.status;
+
+
+	/* for SQLlite
 	var list = db.prepare("SELECT warehouseid FROM sensormetadata WHERE sensorid = '" + sensorStatusRequest.sensorID + "'").all();
 	var ind = FindWarehouseSmartNodePosition(list[0].warehouseid);
 	
@@ -201,6 +284,9 @@ app.post('/updatesensorstatus', function(req, res){
 
 	 };
 
+
+	*/
+
 	 res.json(updateSensorStatusResponse); //short for response.sendjson
 
 
@@ -208,28 +294,66 @@ app.post('/updatesensorstatus', function(req, res){
 
 
 
-//{"name":"Warehouse1", "owner": "Derek", "city": "San Jose", "longitude": 388384, "latitude": 304959, "cargoamount": 40, "schedule": 6000}
+//{"name":"Warehouse1", "owner": "Derek", "email": "jessica.hanso@email.com", "city": "San Jose", "longitude": 388384, "latitude": 304959, "cargoamount": 40, "schedule": 6000}
 app.post('/addwarehouse', function(req, res){
 
 	var warehouseNodeAddRequest = req.body;
-
 	var newWarehouseID = generateID(4);
 
 	ArrayOfSmartNodes.push(new SmartNode(newWarehouseID, warehouseNodeAddRequest.schedule));
-
-	addWarehouseMetaData.run(newWarehouseID, warehouseNodeAddRequest.name, warehouseNodeAddRequest.owner, warehouseNodeAddRequest.city, warehouseNodeAddRequest.longitude, warehouseNodeAddRequest.latitude, warehouseNodeAddRequest.cargoamount, warehouseNodeAddRequest.schedule, "on");
 
 	console.log(ArrayOfSmartNodes);
 
 	intervalTracker[newWarehouseID] = setInterval(function() {SendData(newWarehouseID);}, warehouseNodeAddRequest.schedule);
 
 
+	//for mongoDB
+	warehouseNodeAddRequest["warehouse_id"] = newWarehouseID;
+	warehouseNodeAddRequest["warehouse_status"] = "Active";
+
+	var collection = client.db("smartsupplychain_db").collection("warehouse");
+	collection.insertOne(warehouseNodeAddRequest, (err, result) => {console.log(err);});
+
+
+	//for MySQL
+    const id = newWarehouseID;
+    const sql_getWarehouseArray = `SELECT warehouse_id from ${tableName} where email='${req.body.email}'`
+    con.query(sql_getWarehouseArray, (err, result) => {
+        if (err) {
+        console.log(err);
+        res.json({ status: "error", reason: err });
+        } else {
+        if (result.length == 0) {
+            res.json({ status: "error", reason: "user not found" });
+        } else {
+            let warehouseArray = JSON.parse(result[0].warehouse_id||"[]");
+            warehouseArray.push(id);
+            const sql_updateWarehouseArray = `UPDATE ${tableName} SET warehouse_id='${JSON.stringify(warehouseArray)}' WHERE email='${req.body.email}';`
+            con.query(sql_updateWarehouseArray, (err, result) => {
+                if (err) {
+                console.log(err);
+                res.json({ status: "error", reason: err });
+                } else {
+                    res.json({ status: "success", reason: "added warehouse details successfully" });
+                }
+            });
+        }
+        }
+    });
+
+
+
+	//for SQLlite
+	//addWarehouseMetaData.run(newWarehouseID, warehouseNodeAddRequest.name, warehouseNodeAddRequest.owner, warehouseNodeAddRequest.city, warehouseNodeAddRequest.longitude, warehouseNodeAddRequest.latitude, warehouseNodeAddRequest.cargoamount, warehouseNodeAddRequest.schedule, "on");
+	/*
 
 	var message = "Successfully connected warehouse smart node with id: " + newWarehouseID + ".";
 
 	var warehouseNodeAddResponse = {"message": message};
     
     res.json(warehouseNodeAddResponse); //short for response.sendjson
+
+    */
 
 }); //end app.post(/addwarehouse)
 
@@ -246,7 +370,12 @@ app.post('/removewarehouse', function(req, res){
 
 		ArrayOfSmartNodes.splice(ind, 1);
 
-		removeWarehouseMetaData.run(warehouseNodeRemoveRequest.warehouseID);
+		var myQuery = {"warehouse_id": warehouseNodeRemoveRequest.warehouseID};
+		var newValues = { $set: { "warehouse_status": "Removed/Deleted" } };
+		var collection = client.db("smartsupplychain_db").collection("warehouse");
+		collection.updateOne(myQuery, newValues, (err, result) => {console.log(err);});
+
+		//removeWarehouseMetaData.run(warehouseNodeRemoveRequest.warehouseID);
 
 		var message = "Successfully removed warehouse smart node " + warehouseNodeRemoveRequest.warehouseID + ".";
 
@@ -269,6 +398,8 @@ app.post('/removewarehouse', function(req, res){
 app.post('/updatewarehouseschedule', function(req, res){
 
 	var warehouseNodeScheduleUpdate = req.body;
+	warehouseNodeScheduleUpdate.schedule = warehouseNodeScheduleUpdate.schedule * 1000; //convert to millisecond
+
 
 	var ind = FindWarehouseSmartNodePosition(warehouseNodeScheduleUpdate.warehouseID);
 
@@ -277,13 +408,18 @@ app.post('/updatewarehouseschedule', function(req, res){
 
 		clearInterval(intervalTracker[warehouseNodeScheduleUpdate.warehouseID]);
 
-
 		ArrayOfSmartNodes[ind].schedule = warehouseNodeScheduleUpdate.schedule;
-		updateWarehouseSchedule.run(warehouseNodeScheduleUpdate.schedule, warehouseNodeScheduleUpdate.warehouseID);
 
-		
 		intervalTracker[warehouseNodeScheduleUpdate.warehouseID] = setInterval(function() {SendData(warehouseNodeScheduleUpdate.warehouseID);}, warehouseNodeScheduleUpdate.schedule);
 
+
+		var myQuery = {"warehouse_id": warehouseNodeScheduleUpdate.warehouseID};
+		var newValues = { $set: { "schedule": warehouseNodeScheduleUpdate.schedule } };
+		var collection = client.db("smartsupplychain_db").collection("warehouse");
+		collection.updateOne(myQuery, newValues, (err, result) => {console.log(err);});
+
+
+		//updateWarehouseSchedule.run(warehouseNodeScheduleUpdate.schedule, warehouseNodeScheduleUpdate.warehouseID);
 
 		var message = "Successfully updated warehouse " + warehouseNodeScheduleUpdate.warehouseID + " schedule.";
 
@@ -302,6 +438,7 @@ app.post('/updatewarehouseschedule', function(req, res){
 
 //{"warehouseID": , "status":}
 app.post('/updatewarehousenodestatus', function(req, res){
+	
 	console.log(req.body);
 	var warehouseNodeStatusUpdate = req.body;
 
@@ -310,9 +447,14 @@ app.post('/updatewarehousenodestatus', function(req, res){
 
 	if (ind > -1) {
 
-		ArrayOfSmartNodes[ind].status = "warehouseNodeStatusUpdate.status";
+		ArrayOfSmartNodes[ind].status = warehouseNodeStatusUpdate.status;
 
-		updateWarehouseNodeStatus.run(warehouseNodeStatusUpdate.status, warehouseNodeStatusUpdate.warehouseID);
+		var myQuery = {"warehouse_id": warehouseNodeStatusUpdate.warehouseID};
+		var newValues = { $set: { "warehouse_status": warehouseNodeStatusUpdate.status } };
+		var collection = client.db("smartsupplychain_db").collection("warehouse");
+		collection.updateOne(myQuery, newValues, (err, result) => {console.log(err);});	
+
+		//updateWarehouseNodeStatus.run(warehouseNodeStatusUpdate.status, warehouseNodeStatusUpdate.warehouseID);
 
 		var message = "Successfully updated warehouse " + warehouseNodeStatusUpdate.warehouseID + " status.";
 
@@ -326,6 +468,50 @@ app.post('/updatewarehousenodestatus', function(req, res){
     res.json(updateWarehouseStatusResponse); //short for response.sendjson
 
 }); //end app.post(/updatewarehousenodestatus)
+
+
+
+//{"warehouseID": , "email": , "city": }
+app.post('/updatewarehouseinfo', function(req, res){
+	
+	console.log(req.body);
+	var warehouseUpdateInfo = req.body;
+	var myQuery = {"warehouse_id": warehouseUpdateInfo.warehouseID};
+	delete warehouseUpdateInfo.warehouseID;
+
+	var arrayOfProperties = Object.keys(warehouseUpdateInfo);
+
+	
+
+	for (var i = 0; i < arrayOfProperties.length; i++) {
+
+		/*
+		if (arrayOfProperties[i] == "status") {
+			var ind = FindWarehouseSmartNodePosition(myQuery["warehouse_id"]);
+			ArrayOfSmartNodes[ind].status = warehouseNodeStatusUpdate.status;
+		};
+		*/
+
+		var newValuesJSON = {};
+		newValuesJSON[arrayOfProperties[i]] = warehouseUpdateInfo[arrayOfProperties[i]];
+		var newValues = { $set: newValuesJSON };
+		var collection = client.db("smartsupplychain_db").collection("warehouse");
+		collection.updateOne(myQuery, newValues, (err, result) => {console.log(err);});	
+
+	};
+
+    
+    res.json("Updated"); //short for response.sendjson
+
+}); //end app.post(/updatewarehousenodestatus)
+
+
+
+
+
+
+
+
 
 
 
@@ -447,6 +633,24 @@ app.post("/getsensordatabyuser", function(req, res) {
 
 
 
+function FindWarehousePositionBySensorID(_sensorID) {
+
+	for (var i = 0; i < ArrayOfSmartNodes.length; i++) {
+
+		if (ArrayOfSmartNodes[i].findSensorPositionInSensorList(_sensorID) != -1) {
+			return i;
+		};
+
+	}; //end for
+
+	return -1;
+
+}; //end function
+
+
+
+
+
 
 
 function generateID(length) {
@@ -475,7 +679,6 @@ function SendData(_warehouseID) {
 
 
 
-
 class SmartNode {
 
 	constructor(_warehouseID, _schedule) {
@@ -483,7 +686,7 @@ class SmartNode {
 		this.warehouseID = _warehouseID;
 		this.sensorList = [];
 		this.schedule = _schedule;
-		this.status = "on";
+		this.status = "Active";
 
 	}
 
@@ -536,9 +739,10 @@ class SmartNode {
 
 	getSensorData() {
 
-		if (this.sensorList.length > 0 && this.status == "on") {
+		if (this.sensorList.length > 0 && this.status == "Active") {
 
 			var time = new Date().getTime();
+			var date = new Date(time);
 			var sensorData = 1;
 
 			for (var i = 0; i < this.sensorList.length; i++) {
@@ -546,8 +750,10 @@ class SmartNode {
 				if (this.sensorList[i].status == "Active") {
 					sensorData = this.sensorList[i].getData();
 
-					//sensorData is json format of {"value": , "measurementUnit":}
-					addWarehouseSensorData.run(this.warehouseID, this.sensorList[i].sensorID, sensorData.value, sensorData.measurementUnit, time);
+					var sJSON = {"warehouse_id": this.warehouseID, "sensor_id": this.sensorList[i].sensorID, "value": sensorData.value, "measurementunit": sensorData.measurementUnit, "dateTime": date};
+
+					var collectionSensorData = client.db("smartsupplychain_db").collection("sensor_history");
+					collectionSensorData.insertOne(sJSON, (err, result) => {console.log(err);});
 
 					console.log(this.warehouseID);
 					console.log(this.sensorList[i].sensorID);
@@ -562,5 +768,7 @@ class SmartNode {
 
 
 }; //end class Smart Node
+
+
 
 

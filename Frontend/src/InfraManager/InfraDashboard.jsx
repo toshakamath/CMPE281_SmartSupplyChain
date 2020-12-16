@@ -11,6 +11,8 @@ import { withRouter } from "react-router-dom";
 import customerJson from '../mock_data/customer';
 import axios from 'axios';
 
+const url = "http://127.0.0.1:4000";
+
 class InfraDashboard extends React.Component {
     constructor(props) {
         super(props);
@@ -32,7 +34,15 @@ class InfraDashboard extends React.Component {
             deleteModal: false,
             searchBarValue: "",
             zoom: 14,
-            centerLocation: {}
+            centerLocation: {},
+            addWarehouseForm: {
+                name: "",
+                city: "",
+                schedule: 1000,
+                lng: 0,
+                lat: 0,
+              },
+            deleteWarehouse: ""
         }
     }
 
@@ -64,6 +74,30 @@ class InfraDashboard extends React.Component {
           console.log("error in getting all users from mysql: ",err);
         });
     }
+
+    addWarehouseSubmit = (e) => {
+        e.preventDefault();
+        let form = this.state.addWarehouseForm;
+        console.log(this.state.addWarehouseForm);
+        axios
+          .post(url + "/addwarehouse", {
+            name: form.name,
+            owner: "Test",
+            city: form.city,
+            longitude: form.lng,
+            latitude: form.lat,
+            cargoamount: 30,
+            schedule: form.schedule * 1000,
+          })
+          .then((response) => {
+            console.log(response);
+            this.modalToggle(e);
+          })
+          .catch((error) => {
+            console.log(error);
+            this.modalToggle(e);
+          });
+      };
 
   getAllWarehouses = () => {
     console.log("Inside getAllWarehouses!");
@@ -199,6 +233,36 @@ class InfraDashboard extends React.Component {
             searchBarValue: e.target.value
         });
     }
+
+    handleAddWareChange = (e) => {
+        let form = this.state.addWarehouseForm;
+        form[e.target.name] = e.target.value;
+        this.setState({
+        addWarehouseForm: form,
+        });
+    };
+
+    handleDeleteWareChange = (e) => {
+        this.setState({
+          [e.target.name]: e.target.value,
+        });
+      };
+
+    deleteWarehouseSubmit = (e) => {
+        // delete warehouse from the network for the specific customer
+        axios
+          .post(url + "/removewarehouse", {
+            warehouseID: this.state.deleteWarehouse
+          })
+          .then((response) => {
+            console.log(response);
+            this.deleteToggle(e);
+          })
+          .catch((error) => {
+            console.log(error);
+            this.deleteToggle(e);
+          });
+      };
 
     render () {
         return(
@@ -349,7 +413,9 @@ class InfraDashboard extends React.Component {
                     <Modal isOpen={this.state.deleteModal} toggle={this.deleteToggle}>
                         <ModalHeader toggle={this.deleteToggle}>Delete Warehouse</ModalHeader>
                         <ModalBody>
-                            <Form onSubmit={this.deleteWarehouseSubmit}>
+                            <Form
+                                onChange={this.handleDeleteWareChange}
+                                onSubmit={this.deleteWarehouseSubmit}>
                                 <FormGroup>
                                     <Label for="exampleEmail">Warehouse Name</Label>
                                     <Input type="select" name="warehouse_delete">
@@ -363,7 +429,7 @@ class InfraDashboard extends React.Component {
                             </Form>
                         </ModalBody>
                         <ModalFooter>
-                            <Button color="danger" onClick={this.deleteToggle}>Delete</Button>{' '}
+                            <Button color="danger" type="submit">Delete</Button>{' '}
                             <Button color="primary" onClick={this.deleteToggle}>Cancel</Button>
                         </ModalFooter>
                     </Modal>
@@ -371,7 +437,9 @@ class InfraDashboard extends React.Component {
                     <Modal isOpen={this.state.modal} toggle={this.modalToggle}>
                         <ModalHeader toggle={this.modalToggle}>Add Warehouse</ModalHeader>
                         <ModalBody>
-                            <Form onSubmit={this.addWarehouseSubmit}>
+                            <Form
+                                onChange={this.handleAddWareChange} 
+                                onSubmit={this.addWarehouseSubmit}>
                                 <FormGroup>
                                     <Label for="exampleEmail">Warehouse Name</Label>
                                     <Input type="email" name="email" id="exampleEmail" placeholder="Name here..." />
@@ -390,14 +458,35 @@ class InfraDashboard extends React.Component {
                                         </Col>
                                         <Col>
                                             <Label>Zipcode</Label>
-                                            <Input name="address"/>
+                                            <Input name="zip_code"/>
                                         </Col>
                                     </Row>
+                                </FormGroup>
+                                <FormGroup>
+                                    <Row>
+                                    <Col>
+                                        <Label>Longitude</Label>
+                                        <Input name="lng" />
+                                    </Col>
+                                    <Col>
+                                        <Label>Latitude</Label>
+                                        <Input name="lat" />
+                                    </Col>
+                                    </Row>
+                                </FormGroup>
+                                <FormGroup>
+                                    <Label for="exampleEmail">Schedule(grab every second)</Label>
+                                    <Input
+                                    type="number"
+                                    name="schedule"
+                                    id="exampleEmail"
+                                    placeholder="0"
+                                    />
                                 </FormGroup>
                             </Form>
                         </ModalBody>
                         <ModalFooter>
-                            <Button color="primary" onClick={this.modalToggle}>Add</Button>{' '}
+                            <Button color="primary" type="submit">Add</Button>{' '}
                             <Button color="danger" onClick={this.modalToggle}>Cancel</Button>
                         </ModalFooter>
                     </Modal>
