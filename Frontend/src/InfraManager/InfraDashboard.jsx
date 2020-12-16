@@ -51,7 +51,9 @@ class InfraDashboard extends React.Component {
           console.log("response: ", res.data);
           let cust = []
           res.data.users.forEach((customer) => {
-            let tmp = [customer.name, JSON.parse(customer.warehouse_id).length, customer.email];
+              let size = JSON.parse(customer.warehouse_id)
+              console.log(size.length+">>>"+customer);
+            let tmp = [customer.name, (JSON.parse(customer.warehouse_id||[]).length)||0, customer.email];
             cust.push(tmp);
             });
             this.setState({

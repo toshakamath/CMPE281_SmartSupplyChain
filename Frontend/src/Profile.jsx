@@ -29,6 +29,7 @@ import {
   CartesianGrid,
 } from "recharts";
 import { withRouter, Link } from "react-router-dom";
+import axios from 'axios'
 
 /*
 TODO: Work on modal forms for edit profile, edit billing and view charts
@@ -37,6 +38,7 @@ class Profile extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      profile:{},
       chart_data: [],
       role: localStorage.getItem("user") ? localStorage.getItem("user") : "",
       expenseModal: false,
@@ -53,6 +55,7 @@ class Profile extends React.Component {
 
   componentDidMount() {
     // test data
+    this.getProfile()
     this.setState({
       chart_data: [
         { name: "15:05", expense: 68 },
@@ -82,6 +85,22 @@ class Profile extends React.Component {
         ["15:55", "map", 75],
         ["16:00", "sensor", 76],
       ],
+    });
+  }
+
+  getProfile =()=>{
+    console.log("Inside getProfile!");
+    const email = localStorage.getItem("email");
+    axios
+    .get(`http://localhost:3001/user?email=${email}`)
+    .then((res) => {
+      console.log("response: ", res.data);
+        this.setState({
+            profile: (res.data||{}).user_details||{}
+        });
+    })
+    .catch((err) => {
+      console.log("error in getting user details from mysql: ",err);
     });
   }
 
@@ -117,29 +136,25 @@ class Profile extends React.Component {
               <Table borderless={true}>
                 <thead>
                   <tr>
-                    <th>Name of the User</th>
+                    <th>{(this.state.profile||{}).name||""}</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
                     <th scope="row">Role:</th>
-                    <th scope="row">{this.state.role}</th>
+                    <th scope="row">{(this.state.profile||{}).role||""}</th>
                   </tr>
                   <tr>
                     <th scope="row">Address</th>
-                    <th scope="row">1234 Rainbow Rd</th>
-                  </tr>
-                  <tr>
-                    <th scope="row"></th>
-                    <th scope="row">City, State Zipcode</th>
+                    <th scope="row">{(this.state.profile||{}).address||""}</th>
                   </tr>
                   <tr>
                     <th scope="row">Email:</th>
-                    <th scope="row">test@test.com</th>
+                    <th scope="row">{this.state.profile.email}</th>
                   </tr>
                   <tr>
                     <th scope="row">Phone Number:</th>
-                    <th scope="row">+1(888)-009-1234</th>
+                    <th scope="row">{this.state.profile.phone}</th>
                   </tr>
                 </tbody>
               </Table>
@@ -159,11 +174,7 @@ class Profile extends React.Component {
                   </tr>
                   <tr>
                     <th scope="row">Billing Address:</th>
-                    <th scope="row">1234 Rainbow Rd</th>
-                  </tr>
-                  <tr>
-                    <th scope="row"></th>
-                    <th scope="row">City, State Zipcode</th>
+                    <th scope="row">{(this.state.profile||{}).address||""}</th>
                   </tr>
                 </tbody>
               </Table>
