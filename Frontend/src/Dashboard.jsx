@@ -419,7 +419,7 @@ class Dashboard extends React.Component {
                   </Col>
                   <Col>
                     <Label>Zipcode</Label>
-                    <Input name="address" />
+                    <Input name="zip_code" />
                   </Col>
                 </Row>
               </FormGroup>

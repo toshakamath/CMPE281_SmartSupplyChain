@@ -35,6 +35,9 @@ import {
 import { Link } from "react-router-dom";
 import warehouseJSON from "./mock_data/warehouse";
 import customerJson from "./mock_data/customer.js";
+import axios from "axios";
+
+const url = "http://127.0.0.1:4000";
 
 class Warehouse extends React.Component {
   constructor(props) {
@@ -49,20 +52,25 @@ class Warehouse extends React.Component {
       chart_data: [],
       addSensorModal: false,
       manageSensorModal: false,
-      manageOrderModal: false,
       isOpen: false,
       addSensor: {
         sensorType: "temperature",
+        sensorName: "",
+        location: ""
       },
       manageSensor: {
+        sensorID: '',
         sensorType: "temperature",
+        sensorName: "",
+        location: ''
       },
       individualSensorId: null,
       selectedSensor: false,
       orderHistory: warehouseJSON[0].history,
       deleteToggle: false,
       perPage: 5,
-      warehouse: []
+      warehouse: [],
+      deletedSensor: ''
     };
   }
 
@@ -116,16 +124,24 @@ class Warehouse extends React.Component {
     // add sensor
     e.preventDefault();
     console.log("Adding sensors..");
+    console.log(this.state.addSensor);
+    
+    let sensor = this.state.addSensor;
+    axios.post(url + "/addsensor", {
+      warehouseID: this.state.warehouseId,
+      sensortype: sensor.sensorType
+    }).then((response) => {
+      console.log(response);
+      this.addSensorToggle(e);
+    }).catch((error) => {
+      console.log(error);
+      this.addSensorToggle(e);
+    });
   };
 
   manageSensorToggle = () => {
     this.setState({
       manageSensorModal: !this.state.manageSensorModal,
-    });
-  };
-  manageOrderToggle = () => {
-    this.setState({
-      manageOrderModal: !this.state.manageOrderModal,
     });
   };
 
@@ -142,15 +158,17 @@ class Warehouse extends React.Component {
 
   handleAddSensorChange = (e) => {
     console.log(e.target.value);
+    let add = this.state.addSensor;
+    add[e.target.name] = e.target.value;
     this.setState({
-      addSensor: {
-        sensorType: e.target.value,
-      },
+      addSensor: add
     });
   };
 
   handleManageSensorChange = (e) => {
     console.log(e.target.value);
+    let sensor = this.state.manageSensor;
+    sensor[e.target.name] = e.target.value;
     this.setState({
       manageSensor: {
         sensorType: e.target.value,
@@ -158,15 +176,38 @@ class Warehouse extends React.Component {
     });
   };
 
-  manageIndividualSensor = () => {
+  manageIndividualSensor = (e, sensor) => {
+    axios.post(url + "/updatesensorstatus", {
+      sensorID: sensor.id,
+      status: ""
+    }).then((response) => {
+      console.log(response);
+      this.manageSensorToggle(e);
+    }).catch((error) => {
+      console.log(error);
+      this.manageSensorToggle(e);
+    });
     this.setState({
       selectedSensor: !this.state.selectedSensor,
     });
   };
 
-  deleteSensorToggle = () => {
+  deleteSensor = (e) => {
+    axios.post(url + "/delete", {
+      sensorId: this.state.deletedSensor
+    }).then((response) => {
+      console.log(response);
+      this.deleteSensorToggle(e, null);
+    }).catch((error) => {
+      console.log(error);
+      this.deleteSensorToggle(e, null);
+    })
+  }
+
+  deleteSensorToggle = (e, sensor) => {
     this.setState({
       deleteToggle: !this.state.deleteToggle,
+      deleteSensor: sensor ? sensor.id : ''
     });
   };
 
@@ -287,10 +328,10 @@ class Warehouse extends React.Component {
                         <PaginationLink last />
                       </PaginationItem>
                     </Pagination>
-                    <Button color="primary" onClick={this.manageSensorToggle}>
+                    <Button color="primary" onClick={e => this.manageSensorToggle(e, sen)}>
                       Manage Sensor
                     </Button>{" "}
-                    <Button color="danger" onClick={this.deleteSensorToggle}>
+                    <Button color="danger" onClick={e => this.deleteSensorToggle(e, sen)}>
                       Delete
                     </Button>
                   </CardBody>
@@ -395,33 +436,32 @@ class Warehouse extends React.Component {
         <Modal isOpen={this.state.addSensorModal} toggle={this.addSensorToggle}>
           <ModalHeader toggle={this.addSensorToggle}>Add Sensor</ModalHeader>
           <ModalBody>
-            <Form onSubmit={this.addSensorSubmit}>
+            <Form onChange={this.handleAddSensorChange} onSubmit={this.addSensorSubmit}>
               <FormGroup>
                 <Label for="exampleEmail">Sensor Name</Label>
                 <Input
-                  type="email"
-                  name="email"
+                  name="sensorName"
                   id="exampleEmail"
                   placeholder="Sensor #1"
+                  value={this.state.addSensor.sensorName}
                 />
               </FormGroup>
               <FormGroup>
                 <Label for="examplePassword">Location</Label>
                 <Input
-                  type="password"
-                  name="password"
+                  name="location"
                   id="examplePassword"
                   placeholder="Second Floor"
+                  value={this.state.addSensor.location}
                 />
               </FormGroup>
               <FormGroup>
                 <Label for="exampleSelect">Sensor Type</Label>
                 <Input
                   type="select"
-                  name="select"
+                  name="sensorType"
                   id="exampleSelect"
                   value={this.state.addSensor.sensorType}
-                  onChange={this.handleAddSensorChange}
                 >
                   <option value="temperature">Temperature</option>
                   <option value="humidity">Humidity</option>
@@ -445,7 +485,6 @@ class Warehouse extends React.Component {
                 <Button
                   color="primary"
                   type="submit"
-                  onClick={this.addSensorToggle}
                 >
                   Submit
                 </Button>{" "}
@@ -514,9 +553,9 @@ class Warehouse extends React.Component {
 
         <Modal
           isOpen={this.state.deleteToggle}
-          toggle={this.deleteSensorToggle}
+          toggle={(e) => this.deleteSensorToggle(e, null)}
         >
-          <ModalHeader toggle={this.deleteSensorToggle}>
+          <ModalHeader toggle={(e) => this.deleteSensorToggle(e, null)}>
             Are you sure?
           </ModalHeader>
           <ModalBody>
@@ -525,13 +564,11 @@ class Warehouse extends React.Component {
           <ModalFooter>
             <Button
               color="primary"
-              onClick={() => {
-                console.log("deleted!");
-              }}
+              onClick={e => this.deleteSensor(e)}
             >
               Continue
             </Button>{" "}
-            <Button color="danger" onClick={this.deleteSensorToggle}>
+            <Button color="danger" onClick={e => this.deleteSensorToggle(e, null)}>
               Cancel
             </Button>
           </ModalFooter>
