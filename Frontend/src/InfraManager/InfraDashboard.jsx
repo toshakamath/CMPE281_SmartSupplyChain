@@ -161,7 +161,7 @@ class InfraDashboard extends React.Component {
         console.log("response: ", res.data);
         let customer_data = [];
             customer_data = res.data.warehouses.map((ware) => {
-              return [ware.name, ware.orders, ware.address, ware.warehouse_status];
+              return [ware.name, ware.orders, ware.city, ware.warehouse_status, ware.warehouse_id];
             });
         this.setState({
           markerData: res.data.warehouses,
@@ -180,7 +180,8 @@ class InfraDashboard extends React.Component {
         this.props.history.push({
             pathname: '/manager_warehouse',
             state: {
-                name: r[0]
+                name: r[0],
+                id: r[4]
             }
         });
     }

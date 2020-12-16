@@ -12,6 +12,8 @@
   "dependencies": {
     "better-sqlite3": "^7.1.1",
     "express": "^4.17.1",
+    "mongodb": "^3.6.3",
+    "mysql": "^2.18.1",
     "socket.io": "^3.0.3"
   }
 }

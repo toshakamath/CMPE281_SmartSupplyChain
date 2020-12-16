@@ -30,11 +30,13 @@ import {
 } from "recharts";
 import { Link } from "react-router-dom";
 import customerJson from "../mock_data/customer.js";
+import axios from 'axios';
 
 class SupportWarehouse extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      sensors:[],
       warehouseId: this.props.location.state
         ? this.props.location.state.warehouseId
         : null,
@@ -57,10 +59,32 @@ class SupportWarehouse extends React.Component {
   }
 
   componentDidMount() {
+    console.log("PROPSSS:", this.props)
+    if(localStorage.getItem("warehouse_name").length===0)
+      localStorage.setItem("warehouse_name", (this.props.location.state||{}).name||"")
+    if(localStorage.getItem("warehouse_id").length===0)
+      localStorage.setItem("warehouse_id", (this.props.location.state||{}).id||"")
+
+    this.getListOfSensorsInAWarehouse(localStorage.getItem("warehouse_id"))
     // console.log(this.props.location.state.warehouseId);
     console.log(this.state.warehouseId);
     // make call to grab all sensor data from the selected warehouse
     // default detailed warehouse is first on the list
+  }
+
+  getListOfSensorsInAWarehouse = (warehouse_id) =>{
+    console.log("Inside getListOfSensorsInAWarehouse!");
+    axios
+        .get(`http://localhost:3001/warehouse/${warehouse_id}/sensors`)
+        .then((res) => {
+          console.log("response: ", res.data);
+          this.setState({
+            sensors: res.data.sensors
+          })
+        })
+        .catch((err) => {
+          console.log("error in getting all users from mysql: ",err);
+        });
   }
 
   addSensorToggle = () => {
@@ -144,7 +168,7 @@ class SupportWarehouse extends React.Component {
       <Container className="pb-5" fluid={true}>
         <Row className="justify-content-md-center pt-4 pb-4">
           <Col md="2">
-            <h2>Warehouse {this.state.warehouseName}</h2>
+            <h2>{localStorage.getItem("warehouse_name")}</h2>
           </Col>
           <Col md="2">
             <Button color="primary" onClick={this.addSensorToggle}>
@@ -186,6 +210,81 @@ class SupportWarehouse extends React.Component {
                 <Card width="100%">
                   <CardBody>
                     <CardTitle tag="h5">{sen.name}</CardTitle>
+                    <ResponsiveContainer width="100%" height={300}>
+                      <LineChart data={chart_data}>
+                        <Line
+                          type="monotone"
+                          dataKey="generic"
+                          stroke="#8884d8"
+                        />
+                        <CartesianGrid stroke="#ccc" />
+                        <XAxis dataKey="name" />
+                        <YAxis domain={range} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                    <CustomTable
+                      title="History"
+                      header={header}
+                      trows={history_data}
+                      handleRowClick={this.handleRowClick}
+                    />
+                    <Pagination>
+                      <PaginationItem>
+                        <PaginationLink first />
+                      </PaginationItem>
+                      <PaginationItem>
+                        <PaginationLink previous />
+                      </PaginationItem>
+                      {this.orderTablePagination(index)}
+                      <PaginationItem>
+                        <PaginationLink next />
+                      </PaginationItem>
+                      <PaginationItem>
+                        <PaginationLink last />
+                      </PaginationItem>
+                    </Pagination>
+                    <Button color="primary" onClick={this.manageSensorToggle}>
+                      Manage Sensor
+                    </Button>{" "}
+                    <Button color="danger" onClick={this.deleteSensorToggle}>
+                      Delete
+                    </Button>
+                  </CardBody>
+                </Card>
+              </Col>
+            );
+          })}
+          {this.state.sensors.map((sen, index) => {
+            let header = [];
+            let range = [0, 100];
+            if (sen.sensor_type === "temperature") {
+              header = ["Time", "Temperature"];
+            } else if (sen.sensor_type === "uv") {
+              header = ["Time", "UV Index"];
+              range = [0, 10];
+            } else if (sen.sensor_type === "humidity") {
+              console.log("here??")
+              header = ["Time", "Concentration"];
+            }
+
+            const chart_data = [];
+            const history_data = [];
+            // sen.history.forEach((dt) => {
+            //   if (history_data.length < 6) {
+            //     history_data.push(dt);
+            //   }
+            //   let tmp = { name: "", generic: "" };
+            //   let x = dt[0].split("-");
+            //   tmp.name = x[1];
+            //   tmp.generic = dt[1];
+            //   chart_data.push(tmp);
+            // });
+
+            return (
+              <Col className="pb-4" xs="auto" md="4">
+                <Card width="100%">
+                  <CardBody>
+                    <CardTitle tag="h5">{sen.sensor_type} sensor</CardTitle>
                     <ResponsiveContainer width="100%" height={300}>
                       <LineChart data={chart_data}>
                         <Line
