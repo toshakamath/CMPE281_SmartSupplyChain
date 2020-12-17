@@ -318,6 +318,13 @@ app.post('/addwarehouse', function(req, res){
 	warehouseNodeAddRequest["warehouse_id"] = newWarehouseID;
 	warehouseNodeAddRequest["warehouse_status"] = "Active";
 
+	var randomCargo = (10*(Math.floor(Math.random() * 10) + 1));
+
+	warehouseNodeAddRequest["cargoamount"] = randomCargo;
+
+
+
+
 	var collection = client.db("smartsupplychain_db").collection("warehouse");
 	collection.insertOne(warehouseNodeAddRequest, (err, result) => {console.log(err);});
 
