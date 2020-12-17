@@ -189,7 +189,7 @@ class Dashboard extends React.Component {
   };
 
   addWarehouseSubmit = (e) => {
-    e.preventDefault();
+    // e.preventDefault();
     let form = this.state.addWarehouseForm;
     console.log(this.state.addWarehouseForm);
     // use react geocode to convert address to lat/lng
@@ -202,9 +202,11 @@ class Dashboard extends React.Component {
         latitude: form.lat,
         cargoamount: 30,
         schedule: form.schedule * 1000,
+        email: this.state.selectedCustEmail
       })
       .then((response) => {
         console.log(response);
+        this.getAllWarehouses();
         this.modalToggle(e);
       })
       .catch((error) => {
@@ -217,10 +219,11 @@ class Dashboard extends React.Component {
     // delete warehouse from the network for the specific customer
     axios
       .post(url + "/removewarehouse", {
-        warehouseID: "",
+        warehouseID: this.state.deleteWarehouse
       })
       .then((response) => {
         console.log(response);
+        this.getAllWarehouses();
         this.deleteToggle(e);
       })
       .catch((error) => {

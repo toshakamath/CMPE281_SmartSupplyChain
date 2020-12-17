@@ -71,7 +71,11 @@ class Warehouse extends React.Component {
       deleteToggle: false,
       perPage: 5,
       warehouse: [],
-      deletedSensor: ''
+      deletedSensor: '',
+      manageSensor: {
+        status: "active"
+      },
+      manageId: ""
     };
   }
 
@@ -154,10 +158,11 @@ class Warehouse extends React.Component {
     
     let sensor = this.state.addSensor;
     axios.post(url + "/addsensor", {
-      warehouseID: this.state.warehouseId,
+      warehouseID: localStorage.getItem("warehouse_id"),
       sensortype: sensor.sensorType
     }).then((response) => {
       console.log(response);
+      this.getListOfSensorsInAWarehouse(localStorage.getItem("warehouse_id"));
       this.addSensorToggle(e);
     }).catch((error) => {
       console.log(error);
@@ -191,32 +196,30 @@ class Warehouse extends React.Component {
     });
   };
 
-  handleManageSensorChange = (e) => {
-    console.log(e.target.value);
-    let sensor = this.state.manageSensor;
-    sensor[e.target.name] = e.target.value;
+  manageSensorChange = (e) => {
+    let manage = this.state.manageSensor;
+    manage.status = e.target.value;
     this.setState({
-      manageSensor: {
-        sensorType: e.target.value,
-      },
+      manageSensor: manage
     });
-  };
+  }
 
-  manageIndividualSensor = (e, sensor) => {
+  manageIndividualSensor = (e) => {
+    e.preventDefault();
+    console.log("managing sensors..");    
+    let sensor = this.state.addSensor;
     axios.post(url + "/updatesensorstatus", {
-      sensorID: sensor.id,
-      status: ""
+      sensorID: this.state.manageId,
+      status: this.state.manageSensor.status
     }).then((response) => {
       console.log(response);
-      this.manageSensorToggle(e);
+      this.getListOfSensorsInAWarehouse(localStorage.getItem("warehouse_id"));
+      this.manageSensorToggle(e, null);
     }).catch((error) => {
       console.log(error);
-      this.manageSensorToggle(e);
+      this.manageSensorToggle(e, null);
     });
-    this.setState({
-      selectedSensor: !this.state.selectedSensor,
-    });
-  };
+  }
 
   deleteSensor = (e) => {
     axios.post(url + "/delete", {
@@ -230,12 +233,18 @@ class Warehouse extends React.Component {
     })
   }
 
-  deleteSensorToggle = (e, sensor) => {
+  deleteSensorToggle = () => {
     this.setState({
-      deleteToggle: !this.state.deleteToggle,
-      deleteSensor: sensor ? sensor.id : ''
+      deleteToggle: !this.state.deleteToggle
     });
   };
+
+  deleteSensorSelected = (sensor) => {
+    this.setState({
+      deletedSensor: sensor ? sensor.sensor_id : ''
+    });
+    this.deleteSensorToggle();
+  }
 
   renderCustomizedLabel = ({
     cx,
@@ -360,7 +369,7 @@ class Warehouse extends React.Component {
                     <Button color="primary" onClick={e => this.manageSensorToggle(e, sen)}>
                       Manage Sensor
                     </Button>{" "}
-                    <Button color="danger" onClick={e => this.deleteSensorToggle(e, sen)}>
+                    <Button color="danger" onClick={e => this.deleteSensorSelected(sen)}>
                       Delete
                     </Button>
                   </CardBody>
@@ -527,39 +536,15 @@ class Warehouse extends React.Component {
 
         <Modal
           isOpen={this.state.manageSensorModal}
-          toggle={this.manageSensorToggle}
+          toggle={e => this.manageSensorToggle(e, null)}
         >
-          <ModalHeader toggle={this.manageSensorToggle}>
+          <ModalHeader toggle={e => this.manageSensorToggle(e, null)}>
             Manage Sensor
           </ModalHeader>
           <ModalBody>
-            <Form onSubmit={this.manageIndividualSensor}>
-              <FormGroup>
-                <Label for="exampleEmail">Sensor Name</Label>
-                <Input
-                  type="email"
-                  name="email"
-                  id="exampleEmail"
-                  placeholder="Sensor #1"
-                />
-              </FormGroup>
-              <FormGroup>
-                <Label for="examplePassword">Location</Label>
-                <Input
-                  type="password"
-                  name="password"
-                  id="examplePassword"
-                  placeholder="Second Floor"
-                />
-              </FormGroup>
-              <FormGroup>
-                <Label for="exampleSelect">Sensor Type</Label>
-                <Input type="select" name="select">
-                  <option value="temperature">Temperature</option>
-                  <option value="humidity">Humidity</option>
-                  <option value="uv">UV</option>
-                </Input>
-              </FormGroup>
+            <Form 
+              onSubmit={this.manageIndividualSensor}
+              onChange={this.manageSensorChange}>
               <FormGroup>
                 <Label for="exampleSelect">Action</Label>
                 <Input type="select" name="select">
@@ -572,7 +557,7 @@ class Warehouse extends React.Component {
                 <Button color="primary" type="submit">
                   Update
                 </Button>{" "}
-                <Button color="danger" onClick={this.manageSensorToggle}>
+                <Button color="danger" onClick={e => this.manageSensorToggle(e, null)}>
                   Cancel
                 </Button>
               </ModalFooter>
@@ -582,9 +567,9 @@ class Warehouse extends React.Component {
 
         <Modal
           isOpen={this.state.deleteToggle}
-          toggle={(e) => this.deleteSensorToggle(e, null)}
+          toggle={this.deleteSensorToggle}
         >
-          <ModalHeader toggle={(e) => this.deleteSensorToggle(e, null)}>
+          <ModalHeader toggle={this.deleteSensorToggle}>
             Are you sure?
           </ModalHeader>
           <ModalBody>
@@ -597,7 +582,7 @@ class Warehouse extends React.Component {
             >
               Continue
             </Button>{" "}
-            <Button color="danger" onClick={e => this.deleteSensorToggle(e, null)}>
+            <Button color="danger" onClick={this.deleteSensorToggle}>
               Cancel
             </Button>
           </ModalFooter>
