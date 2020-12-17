@@ -76,6 +76,7 @@ class Dashboard extends React.Component {
         console.log("response: ", res.data);
         this.setState({
           warehouses: res.data.warehouses,
+          markerData: res.data.warehouses
         });
         this.populateWarehouseTable();
       })
@@ -189,24 +190,24 @@ class Dashboard extends React.Component {
   };
 
   addWarehouseSubmit = (e) => {
-    // e.preventDefault();
+    e.preventDefault();
     let form = this.state.addWarehouseForm;
     console.log(this.state.addWarehouseForm);
     // use react geocode to convert address to lat/lng
     axios
       .post(url + "/addwarehouse", {
         name: form.name,
-        owner: "Test",
+        owner: "Owner",
         city: form.city,
         longitude: form.lng,
         latitude: form.lat,
         cargoamount: 30,
         schedule: form.schedule * 1000,
-        email: this.state.selectedCustEmail
+        email: localStorage.getItem("email")
       })
       .then((response) => {
         console.log(response);
-        this.getAllWarehouses();
+        this.getWarehousesForUser();
         this.modalToggle(e);
       })
       .catch((error) => {
@@ -223,7 +224,7 @@ class Dashboard extends React.Component {
       })
       .then((response) => {
         console.log(response);
-        this.getAllWarehouses();
+        this.getWarehousesForUser();
         this.deleteToggle(e);
       })
       .catch((error) => {
@@ -300,12 +301,12 @@ class Dashboard extends React.Component {
                 zoom={14}
               >
                 {this.state.markerData.map((obj, index) => {
-                  let lat = parseFloat(obj.location.lat, 10);
-                  let lng = parseFloat(obj.location.lng, 10);
+                  let lat = parseFloat(obj.latitude||"", 10);
+                  let lng = parseFloat(obj.longitude||"", 10);
                   return (
                     <Marker
                       key={index}
-                      name={`${obj.name}-${obj.status}`}
+                      name={`${obj.name}-${obj.warehouse_status}`}
                       onClick={this.onMarkerClick}
                       position={{
                         lat: lat,
@@ -330,7 +331,7 @@ class Dashboard extends React.Component {
                         <Badge
                           color={
                             this.state.selectedMarkerInfo.status.toLowerCase() ===
-                            "operational"
+                            "active"
                               ? "success"
                               : "danger"
                           }
