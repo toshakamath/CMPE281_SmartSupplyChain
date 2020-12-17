@@ -10,6 +10,7 @@ import {
   Button,
   Row,
 } from "reactstrap";
+import axios from 'axios'
 
 class Register extends React.Component {
   constructor(props) {
@@ -17,29 +18,36 @@ class Register extends React.Component {
     this.state = {
       name: "",
       email: "",
-      username: "",
       password: "",
-      role: "Supplier",
+      role: "supplier",
     };
   }
 
   handleChange = (e) => {
     console.log("handle change", e);
-    if (e.target.name === "username") {
-      this.setState({
-        username: e.target.value,
-      });
-    } else {
-      this.setState({
-        pass: e.target.value,
-      });
-    }
+    this.setState({
+      [e.target.name]: e.target.value
+    });
   };
   registerSubmit = (e) => {
     // save user to the backend
     e.preventDefault();
-    console.log("redirect...");
-    this.props.history.push("/login");
+    let data = {
+      name:this.state.name,
+      email:this.state.email,
+      password:this.state.password,
+      role:this.state.role
+    }
+    console.log(data);
+    axios
+    .post(`http://localhost:3001/register`, data)
+    .then((res) => {
+      console.log("redirect...");
+      this.props.history.push("/login");
+    })
+    .catch((err) => {
+      console.log("error while tryign to register the user. Try again!: ",err);
+    });
   };
   render() {
     return (
@@ -75,16 +83,6 @@ class Register extends React.Component {
                 />
               </FormGroup>
               <FormGroup>
-                <Label for="username">Username</Label>
-                <Input
-                  type="text"
-                  name="username"
-                  placeholder="Username"
-                  value={this.state.username}
-                  onChange={this.handleChange}
-                />
-              </FormGroup>
-              <FormGroup>
                 <Label for="password">Password</Label>
                 <Input
                   type="password"
@@ -98,13 +96,13 @@ class Register extends React.Component {
                 <Label for="role">Role</Label>
                 <Input
                   type="select"
-                  name="role-select"
+                  name="role"
                   value={this.state.role}
                   onChange={this.handleChange}
                 >
-                  <option>Supplier</option>
-                  <option>Infrastructure Manager</option>
-                  <option>IOT Support</option>
+                  <option value="supplier">Supplier</option>
+                  <option value="manager">Infrastructure Manager</option>
+                  <option value="support">IOT Support</option>
                 </Input>
               </FormGroup>
               <Button color="primary" type="submit">

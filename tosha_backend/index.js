@@ -35,6 +35,7 @@ mysql.setupMySqlDbConnection((err, mysql_connection) => {
           next();
         });
         app.post("/login", user.login);
+        app.post("/register", user.register);
         app.get("/users", user.getAllCustomers);
         app.get("/user", user.getCustomerDetails);
         app.get("/warehouses", warehouse.getAllWarehouses);

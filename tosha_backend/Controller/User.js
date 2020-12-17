@@ -18,6 +18,21 @@ let login = (request, response) => {
     }
   });
 };
+
+let register = (request, response) => {
+  console.log("request.BODY: ", request.body);
+  let sql = `INSERT INTO ${tableName} (name,email,password,role,warehouse_id) VALUES ('${request.body.name}', '${request.body.email}', '${request.body.password}', '${request.body.role}','[]')`
+  request.sqldb.query(sql, (err, result) => {
+    if (err) {
+      console.log(err);
+      response.json({ status: "error", reason: err });
+    } else {
+        console.log(result);
+        response.json({ status: "success", reason: "registered user successfully", details:result[0] });
+    }
+  });
+};
+
 //update for get customers with role only supplier
 let getAllCustomers = (request, response) => {
   let sql = `SELECT * FROM ${tableName}`;
@@ -62,4 +77,4 @@ let getCustomerDetails = (request, response) => {
   });
 };
 
-module.exports = { login, getAllCustomers, getCustomerDetails };
+module.exports = { login, register, getAllCustomers, getCustomerDetails };
