@@ -30,6 +30,7 @@ import {
 } from "recharts";
 import { withRouter, Link } from "react-router-dom";
 import axios from 'axios'
+import {tosha_backend_url, derek_backend_url} from "./Constants/Constants.js";
 
 /*
 TODO: Work on modal forms for edit profile, edit billing and view charts
@@ -92,7 +93,7 @@ class Profile extends React.Component {
     console.log("Inside getProfile!");
     const email = localStorage.getItem("email");
     axios
-    .get(`http://localhost:3001/user?email=${email}`)
+    .get(`${tosha_backend_url}/user?email=${email}`)
     .then((res) => {
       console.log("response: ", res.data);
         this.setState({

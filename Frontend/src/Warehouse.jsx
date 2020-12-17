@@ -36,8 +36,7 @@ import { Link } from "react-router-dom";
 import warehouseJSON from "./mock_data/warehouse";
 import customerJson from "./mock_data/customer.js";
 import axios from "axios";
-
-const url = "http://127.0.0.1:4000";
+import {tosha_backend_url, derek_backend_url} from "./Constants/Constants.js";
 
 class Warehouse extends React.Component {
   constructor(props) {
@@ -94,7 +93,7 @@ class Warehouse extends React.Component {
     console.log("Inside getSensorHistoryForSensor!");
     sensors.map((s)=>{
       axios
-        .get(`http://localhost:3001/sensor/${s.sensor_id}/history`)
+        .get(`${tosha_backend_url}/sensor/${s.sensor_id}/history`)
         .then((res) => {
           let sensor_withHistory = s
           sensor_withHistory.history = res.data
@@ -113,7 +112,7 @@ class Warehouse extends React.Component {
   getListOfSensorsInAWarehouse = (warehouse_id) =>{
     console.log("Inside getListOfSensorsInAWarehouse!");
     axios
-        .get(`http://localhost:3001/warehouse/${warehouse_id}/sensors`)
+        .get(`${tosha_backend_url}/warehouse/${warehouse_id}/sensors`)
         .then((res) => {
           this.setState({
             sensors: res.data.sensors
@@ -157,7 +156,7 @@ class Warehouse extends React.Component {
     console.log(this.state.addSensor);
     
     let sensor = this.state.addSensor;
-    axios.post(url + "/addsensor", {
+    axios.post(derek_backend_url + "/addsensor", {
       warehouseID: localStorage.getItem("warehouse_id"),
       sensortype: sensor.sensorType
     }).then((response) => {
@@ -208,7 +207,7 @@ class Warehouse extends React.Component {
     e.preventDefault();
     console.log("managing sensors..");    
     let sensor = this.state.addSensor;
-    axios.post(url + "/updatesensorstatus", {
+    axios.post(derek_backend_url + "/updatesensorstatus", {
       sensorID: this.state.manageId,
       status: this.state.manageSensor.status
     }).then((response) => {
@@ -222,7 +221,7 @@ class Warehouse extends React.Component {
   }
 
   deleteSensor = (e) => {
-    axios.post(url + "/delete", {
+    axios.post(derek_backend_url + "/delete", {
       sensorId: this.state.deletedSensor
     }).then((response) => {
       console.log(response);

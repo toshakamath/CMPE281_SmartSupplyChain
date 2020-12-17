@@ -11,6 +11,7 @@ import {
   Row,
 } from "reactstrap";
 import axios from 'axios'
+import {tosha_backend_url, derek_backend_url} from "./Constants/Constants.js";
 
 class Register extends React.Component {
   constructor(props) {
@@ -40,7 +41,7 @@ class Register extends React.Component {
     }
     console.log(data);
     axios
-    .post(`http://localhost:3001/register`, data)
+    .post(`${tosha_backend_url}/register`, data)
     .then((res) => {
       console.log("redirect...");
       this.props.history.push("/login");

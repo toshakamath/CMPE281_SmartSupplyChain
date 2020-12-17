@@ -10,9 +10,7 @@ import { Map, InfoWindow, Marker, GoogleApiWrapper} from 'google-maps-react';
 import { withRouter } from "react-router-dom";
 import customerJson from '../mock_data/customer';
 import axios from 'axios';
-
-const url = "http://127.0.0.1:4000";
-
+import {tosha_backend_url, derek_backend_url} from "../Constants/Constants.js";
 class InfraDashboard extends React.Component {
     constructor(props) {
         super(props);
@@ -57,7 +55,7 @@ class InfraDashboard extends React.Component {
     getAllUsers = () =>{
         console.log("Inside getAllUsers!");
         axios
-        .get(`http://localhost:3001/users`)
+        .get(`${tosha_backend_url}/users`)
         .then((res) => {
           console.log("response: ", res.data);
           let cust = []
@@ -81,7 +79,7 @@ class InfraDashboard extends React.Component {
         let form = this.state.addWarehouseForm;
         console.log(this.state.addWarehouseForm);
         axios
-          .post(url + "/addwarehouse", {
+          .post(derek_backend_url + "/addwarehouse", {
             name: form.name,
             owner: this.state.selectedCustomer,
             city: form.city,
@@ -105,7 +103,7 @@ class InfraDashboard extends React.Component {
   getAllWarehouses = () => {
     console.log("Inside getAllWarehouses!");
     axios
-    .get(`http://localhost:3001/warehouses`)
+    .get(`${tosha_backend_url}/warehouses`)
       .then((res) => {
         console.log("response: ", res.data);
         this.setState({
@@ -159,7 +157,7 @@ class InfraDashboard extends React.Component {
     e.preventDefault();
     console.log("Inside handleCustomerRowClick!", r);
     axios
-      .get(`http://localhost:3001/warehouse/user/${r[2]}`)
+      .get(`${tosha_backend_url}/warehouse/user/${r[2]}`)
       .then((res) => {
         console.log("warehouses for a user:: ", res.data);
         let customer_data = [];
@@ -262,7 +260,7 @@ class InfraDashboard extends React.Component {
         // e.preventDefault();
         // delete warehouse from the network for the specific customer
         axios
-          .post(url + "/removewarehouse", {
+          .post(derek_backend_url + "/removewarehouse", {
             warehouseID: this.state.deleteWarehouse
           })
           .then((response) => {

@@ -23,8 +23,7 @@ import { withRouter } from "react-router-dom";
 import Geocode from "react-geocode";
 import customerJson from "./mock_data/customer";
 import axios from "axios";
-
-const url = "http://127.0.0.1:4000";
+import {tosha_backend_url, derek_backend_url} from "./Constants/Constants.js";
 
 class Dashboard extends React.Component {
   constructor(props) {
@@ -71,7 +70,7 @@ class Dashboard extends React.Component {
     console.log("Inside getWarehousesForUser!");
     let email = localStorage.getItem("email")
     axios
-    .get(`http://localhost:3001/warehouse/user/${email}`)
+    .get(`${tosha_backend_url}/warehouse/user/${email}`)
       .then((res) => {
         console.log("response: ", res.data);
         this.setState({
@@ -87,7 +86,7 @@ class Dashboard extends React.Component {
 
   getWarehouses() {
     axios
-      .get(url + "/getallwarehousemetadata")
+      .get(derek_backend_url + "/getallwarehousemetadata")
       .then((response) => {
         console.log(response);
       })
@@ -195,7 +194,7 @@ class Dashboard extends React.Component {
     console.log(this.state.addWarehouseForm);
     // use react geocode to convert address to lat/lng
     axios
-      .post(url + "/addwarehouse", {
+      .post(derek_backend_url + "/addwarehouse", {
         name: form.name,
         owner: "Owner",
         city: form.city,
@@ -219,7 +218,7 @@ class Dashboard extends React.Component {
   deleteWarehouseSubmit = (e) => {
     // delete warehouse from the network for the specific customer
     axios
-      .post(url + "/removewarehouse", {
+      .post(derek_backend_url + "/removewarehouse", {
         warehouseID: this.state.deleteWarehouse
       })
       .then((response) => {
