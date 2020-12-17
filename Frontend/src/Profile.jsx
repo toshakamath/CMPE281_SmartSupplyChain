@@ -208,12 +208,37 @@ class Profile extends React.Component {
             Detailed Expense
           </ModalHeader>
           <ModalBody>
-            <CustomTable
+            {/* <CustomTable
               title=""
               header={["Time", "Category", "Expense"]}
               trows={this.state.expense_table}
               handleRowClick={() => {}}
-            />
+            /> */}
+            <Table xs="10" hover={true}>
+                    <thead>
+                    <tr>
+                        {
+                            ["Time", "Category", "Expense"].map((hr) => {
+                                return(
+                                    <th>{hr}</th>
+                                );
+                            })
+                        }
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {
+                            this.state.expense_table.map((r) => {
+                                return(
+                                <tr>
+                                    <td>{r[0]}</td>
+                                    <td>{r[1]}</td>
+                                    <td>{r[2]}</td>
+                                </tr>);
+                            })
+                        }
+                    </tbody>
+                </Table>
           </ModalBody>
           <ModalFooter>
             <Button color="primary" onClick={this.expenseToggle}>

@@ -40,7 +40,7 @@ class Dashboard extends React.Component {
         name: "",
         status: "Unknown",
       },
-      markerData: customerJson[0].warehouses,
+      markerData: [],
       deleteModal: false,
       selectedLocation: {
         lat: "",
@@ -74,8 +74,8 @@ class Dashboard extends React.Component {
       .then((res) => {
         console.log("response: ", res.data);
         this.setState({
-          warehouses: res.data.warehouses,
-          markerData: res.data.warehouses
+          warehouses: res.data.warehouses || [],
+          markerData: res.data.warehouses || []
         });
         this.populateWarehouseTable();
       })
@@ -96,8 +96,8 @@ class Dashboard extends React.Component {
   }
 
   populateWarehouseTable() {
-    let tmp = this.state.warehouses.map((ware) => {
-      return [ware.name, ware.orders, ware.city, ware.warehouse_status, ware.warehouse_id];
+    let tmp = (this.state.warehouses||[]).map((ware) => {
+      return [ware.name, ware.cargoamount, ware.city, ware.warehouse_status, ware.warehouse_id];
     });
     console.log(tmp)
     this.setState({
@@ -200,7 +200,6 @@ class Dashboard extends React.Component {
         city: form.city,
         longitude: form.lng,
         latitude: form.lat,
-        cargoamount: 30,
         schedule: form.schedule * 1000,
         email: localStorage.getItem("email")
       })
@@ -401,7 +400,7 @@ class Dashboard extends React.Component {
                 <Input type="select" name="deleteWarehouse">
                   <option value="">Select a Warehouse</option>
                   {this.state.table_data.map((ware) => {
-                    return <option value={ware[0]}>{ware[0]}</option>;
+                    return <option value={ware[4]}>{ware[0]}</option>;
                   })}
                 </Input>
               </FormGroup>

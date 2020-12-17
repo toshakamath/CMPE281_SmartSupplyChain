@@ -162,7 +162,7 @@ class InfraDashboard extends React.Component {
         console.log("warehouses for a user:: ", res.data);
         let customer_data = [];
             customer_data = res.data.warehouses.map((ware) => {
-              return [ware.name, ware.orders, ware.city, ware.warehouse_status, ware.warehouse_id];
+              return [ware.name, ware.cargoamount, ware.city, ware.warehouse_status, ware.warehouse_id];
             });
         this.setState({
           markerData: res.data.warehouses,
@@ -431,7 +431,7 @@ class InfraDashboard extends React.Component {
                                     <Input type="select" name="deleteWarehouse">
                                         {
                                             this.state.table_data.map((ware) => {
-                                                return(<option value={ware[3]}>{ware[0]}</option>);
+                                                return(<option value={ware[4]}>{ware[0]}</option>);
                                             })
                                         }
                                     </Input>
