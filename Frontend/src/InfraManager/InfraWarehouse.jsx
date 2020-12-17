@@ -421,8 +421,8 @@ class InfraWarehouse extends React.Component {
               <FormGroup>
                 <Label for="exampleSelect">Action</Label>
                 <Input type="select" name="select">
-                  <option value="active">Turn On</option>
-                  <option value="inactive">Turn Off</option>
+                  <option value="Active">Turn On</option>
+                  <option value="Inactive">Turn Off</option>
                   <option value="maintenance">Maintenance</option>
                 </Input>
               </FormGroup>
