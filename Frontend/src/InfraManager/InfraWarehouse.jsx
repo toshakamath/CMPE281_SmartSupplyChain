@@ -34,7 +34,7 @@ import axios from 'axios';
 
 const url = "http://127.0.0.1:4000";
 
-class SupportWarehouse extends React.Component {
+class InfraWarehouse extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -464,4 +464,4 @@ class SupportWarehouse extends React.Component {
   }
 }
 
-export default SupportWarehouse;
+export default InfraWarehouse;
