@@ -290,7 +290,11 @@ app.post('/updatesensorstatus', function(req, res){
 
 	*/
 
-	 res.json(updateSensorStatusResponse); //short for response.sendjson
+	var message = "Unable to update " + sensorStatusRequest.sensorID + " status.";
+
+	var updateSensorStatusResponse = {"message": message};
+
+	res.json(updateSensorStatusResponse); //short for response.sendjson
 
 
 }); //end app.post(/updatesensorstatus)
