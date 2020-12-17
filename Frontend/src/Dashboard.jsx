@@ -402,7 +402,7 @@ class Dashboard extends React.Component {
                 <Input type="select" name="deleteWarehouse">
                   <option value="">Select a Warehouse</option>
                   {this.state.table_data.map((ware) => {
-                    return <option value={ware[0]}>{ware[0]}</option>;
+                    return <option value={ware[4]}>{ware[0]}</option>;
                   })}
                 </Input>
               </FormGroup>

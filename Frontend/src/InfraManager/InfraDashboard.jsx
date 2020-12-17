@@ -433,7 +433,7 @@ class InfraDashboard extends React.Component {
                                     <Input type="select" name="deleteWarehouse">
                                         {
                                             this.state.table_data.map((ware) => {
-                                                return(<option value={ware[3]}>{ware[0]}</option>);
+                                                return(<option value={ware[4]}>{ware[0]}</option>);
                                             })
                                         }
                                     </Input>
