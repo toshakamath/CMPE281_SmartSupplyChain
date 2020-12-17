@@ -98,7 +98,7 @@ class Dashboard extends React.Component {
 
   populateWarehouseTable() {
     let tmp = (this.state.warehouses||[]).map((ware) => {
-      return [ware.name, ware.orders, ware.city, ware.warehouse_status, ware.warehouse_id];
+      return [ware.name, ware.cargoamount, ware.city, ware.warehouse_status, ware.warehouse_id];
     });
     console.log(tmp)
     this.setState({
