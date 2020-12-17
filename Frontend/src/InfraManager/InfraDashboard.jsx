@@ -18,7 +18,7 @@ class InfraDashboard extends React.Component {
         super(props);
         this.state = {
             modal: false,
-            table_header: ["Name", "Orders", "Location", "Status"],
+            table_header: ["Name", "Orders", "Location", "Status", "ID"],
             table_data: [],
             showTooltip: {},
             activeMarker: null,
@@ -158,7 +158,7 @@ class InfraDashboard extends React.Component {
     axios
       .get(`http://localhost:3001/warehouse/user/${r[2]}`)
       .then((res) => {
-        console.log("response: ", res.data);
+        console.log("warehouses for a user:: ", res.data);
         let customer_data = [];
             customer_data = res.data.warehouses.map((ware) => {
               return [ware.name, ware.orders, ware.city, ware.warehouse_status, ware.warehouse_id];
