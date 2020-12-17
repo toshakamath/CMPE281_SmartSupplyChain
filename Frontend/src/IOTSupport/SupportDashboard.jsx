@@ -8,6 +8,7 @@ import CustomTable from "../common/CustomTable.jsx";
 import {Map, InfoWindow, Marker, GoogleApiWrapper} from 'google-maps-react';
 import { withRouter } from "react-router-dom";
 import customerJson from '../mock_data/customer';
+import axios from 'axios';
 
 class SupportDashboard extends React.Component {
     constructor(props) {
@@ -35,14 +36,47 @@ class SupportDashboard extends React.Component {
 
     componentDidMount() {
         const role = localStorage.getItem('user');
-
-        this.grabCustomer();
-        this.grabAllWarehouse();
-        // grab all warehouse in user's home region and load on map
-        // default detailed warehouse is first on the list 
-        // run a condition check on role
-        // Manager and IOT Support will get table of customer
+        this.getAllUsers();
+        // this.grabAllWarehouse();
+        this.getAllWarehouses();
     }
+
+    getAllUsers = () =>{
+        console.log("Inside getAllUsers!");
+        axios
+        .get(`http://localhost:3001/users`)
+        .then((res) => {
+          console.log("response: ", res.data);
+          let cust = []
+          res.data.users.forEach((customer) => {
+              let size = JSON.parse(customer.warehouse_id)
+              console.log(size.length+">>>"+customer);
+            let tmp = [customer.name, (JSON.parse(customer.warehouse_id||[]).length)||0, customer.email];
+            cust.push(tmp);
+            });
+            this.setState({
+                customerTable: cust
+            });
+        })
+        .catch((err) => {
+          console.log("error in getting all users from mysql: ",err);
+        });
+    }
+
+    getAllWarehouses = () => {
+        console.log("Inside getAllWarehouses!");
+        axios
+        .get(`http://localhost:3001/warehouses`)
+          .then((res) => {
+            console.log("response: ", res.data);
+            this.setState({
+              markerData: res.data.warehouses,
+            });
+          })
+          .catch((err) => {
+            console.log("error in getting all users from mysql: ", err);
+          });
+      };
 
     grabAllWarehouse = () => {
 
@@ -96,45 +130,36 @@ class SupportDashboard extends React.Component {
     }
 
     handleCustomerRowClick = (e, r) => {
-        // handle clicking a row
-        // condition check to see if row is for individual warehouse or for everything
-        // clicking orders won't do anything
-
-        // setup table
-        let customer_data = [];
-        customerJson.forEach((customer) => {
-            if (customer.name === r[0]) {
-                customer_data = customer.warehouses.map((ware) => {
-                    return [ware.name, ware.orders, ware.state, ware.status];
+        e.preventDefault();
+        console.log("Inside handleCustomerRowClick!", r);
+        axios
+          .get(`http://localhost:3001/warehouse/user/${r[2]}`)
+          .then((res) => {
+            console.log("warehouses for a user:: ", res.data);
+            let customer_data = [];
+                customer_data = res.data.warehouses.map((ware) => {
+                  return [ware.name, ware.orders, ware.city, ware.warehouse_status, ware.warehouse_id];
                 });
-            }
-        });
-
-        //setup customer markers
-        let customer_marker = [];
-        customerJson.forEach((customer) => {
-            if (customer.name === r[0]) {
-                customer_marker = customer.warehouses.map((ware) => {
-                    return ware;
-                });
-            }
-        });
-        // marker
-
-        this.setState({
-            isCustomerView: !this.state.isCustomerView,
-            selectedCustomer: r[0],
-            table_data: customer_data,
-            markerData: customer_marker
-        });
-    }
+            this.setState({
+              markerData: res.data.warehouses,
+              isCustomerView: !this.state.isCustomerView,
+                selectedCustomer: r[0],
+                selectedCustEmail: r[2],
+                table_data: customer_data,
+            });
+          })
+          .catch((err) => {
+            console.log("error in getting all users from mysql: ", err);
+          });
+      }
 
     handleWarehouseRowClick = (e, r) =>{
         // handle the warehouse row click
         this.props.history.push({
             pathname: '/support_warehouse',
             state: {
-                name: r[0]
+                name: r[0],
+                id: r[4]
             }
         });
     }
