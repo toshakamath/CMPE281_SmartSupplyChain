@@ -31,6 +31,7 @@ class InfraDashboard extends React.Component {
             customerHeader: ["Name", "# of Warehouses"],
             isCustomerView: true,
             selectedCustomer: "",
+            selectedCustEmail: "",
             deleteModal: false,
             searchBarValue: "",
             zoom: 14,
@@ -40,7 +41,7 @@ class InfraDashboard extends React.Component {
                 city: "",
                 schedule: 1000,
                 lng: 0,
-                lat: 0,
+                lat: 0
               },
             deleteWarehouse: ""
         }
@@ -82,12 +83,13 @@ class InfraDashboard extends React.Component {
         axios
           .post(url + "/addwarehouse", {
             name: form.name,
-            owner: "Test",
+            owner: this.state.selectedCustomer,
             city: form.city,
             longitude: form.lng,
             latitude: form.lat,
             cargoamount: 30,
             schedule: form.schedule * 1000,
+            email: this.state.selectedCustEmail
           })
           .then((response) => {
             console.log(response);
@@ -167,6 +169,7 @@ class InfraDashboard extends React.Component {
           markerData: res.data.warehouses,
           isCustomerView: !this.state.isCustomerView,
             selectedCustomer: r[0],
+            selectedCustEmail: r[2],
             table_data: customer_data,
         });
       })
@@ -443,7 +446,7 @@ class InfraDashboard extends React.Component {
                                 onSubmit={this.addWarehouseSubmit}>
                                 <FormGroup>
                                     <Label for="exampleEmail">Warehouse Name</Label>
-                                    <Input name="email" id="exampleEmail" placeholder="Name here..." />
+                                    <Input name="name" id="exampleEmail" placeholder="Name here..." />
                                 </FormGroup>
                                 <FormGroup>
                                     <Label>Address</Label>
