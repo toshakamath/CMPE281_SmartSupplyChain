@@ -41,7 +41,7 @@ class Dashboard extends React.Component {
         name: "",
         status: "Unknown",
       },
-      markerData: customerJson[0].warehouses,
+      markerData: [],
       deleteModal: false,
       selectedLocation: {
         lat: "",
@@ -75,8 +75,8 @@ class Dashboard extends React.Component {
       .then((res) => {
         console.log("response: ", res.data);
         this.setState({
-          warehouses: res.data.warehouses,
-          markerData: res.data.warehouses
+          warehouses: res.data.warehouses || [],
+          markerData: res.data.warehouses || []
         });
         this.populateWarehouseTable();
       })
@@ -97,7 +97,7 @@ class Dashboard extends React.Component {
   }
 
   populateWarehouseTable() {
-    let tmp = this.state.warehouses.map((ware) => {
+    let tmp = (this.state.warehouses||[]).map((ware) => {
       return [ware.name, ware.orders, ware.city, ware.warehouse_status, ware.warehouse_id];
     });
     console.log(tmp)
