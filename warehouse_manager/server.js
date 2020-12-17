@@ -255,7 +255,7 @@ app.post('/updatesensorstatus', function(req, res){
 	var collection = client.db("smartsupplychain_db").collection("sensor");
 	collection.updateOne(myQuery, newValues, (err, result) => {console.log(err);});
 
-	var ind = FindWarehousePositionBySensorID(_sensorID);
+	var ind = FindWarehousePositionBySensorID(sensorStatusRequest.sensorID);
 	var ind2 = ArrayOfSmartNodes[ind].findSensorPositionInSensorList(sensorStatusRequest.sensorID);
 	ArrayOfSmartNodes[ind].sensorList[ind2].status = sensorStatusRequest.status;
 
@@ -290,7 +290,11 @@ app.post('/updatesensorstatus', function(req, res){
 
 	*/
 
-	 res.json(updateSensorStatusResponse); //short for response.sendjson
+	var message = "Unable to update " + sensorStatusRequest.sensorID + " status.";
+
+	var updateSensorStatusResponse = {"message": message};
+
+	res.json(updateSensorStatusResponse); //short for response.sendjson
 
 
 }); //end app.post(/updatesensorstatus)
