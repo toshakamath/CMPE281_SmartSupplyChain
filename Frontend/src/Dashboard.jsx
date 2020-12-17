@@ -30,9 +30,10 @@ class Dashboard extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      warehouses:[],
       modal: false,
       isOpen: false,
-      table_header: ["Name", "Orders", "Location", "Status"],
+      table_header: ["Name", "Orders", "Location", "Status", "ID"],
       table_data: [],
       showTooltip: {},
       activeMarker: null,
@@ -62,8 +63,25 @@ class Dashboard extends React.Component {
 
   componentDidMount() {
     const role = localStorage.getItem("user");
-    this.getWarehouses();
-    this.populateWarehouseTable();
+    this.getWarehousesForUser();
+    // this.getWarehouses();
+  }
+
+  getWarehousesForUser=()=>{
+    console.log("Inside getWarehousesForUser!");
+    let email = localStorage.getItem("email")
+    axios
+    .get(`http://localhost:3001/warehouse/user/${email}`)
+      .then((res) => {
+        console.log("response: ", res.data);
+        this.setState({
+          warehouses: res.data.warehouses,
+        });
+        this.populateWarehouseTable();
+      })
+      .catch((err) => {
+        console.log("error in getting all users from mysql: ", err);
+      });
   }
 
   getWarehouses() {
@@ -78,9 +96,10 @@ class Dashboard extends React.Component {
   }
 
   populateWarehouseTable() {
-    let tmp = customerJson[0].warehouses.map((ware) => {
-      return [ware.name, ware.orders, ware.state, ware.status];
+    let tmp = this.state.warehouses.map((ware) => {
+      return [ware.name, ware.orders, ware.city, ware.warehouse_status, ware.warehouse_id];
     });
+    console.log(tmp)
     this.setState({
       table_data: tmp,
     });
@@ -141,6 +160,7 @@ class Dashboard extends React.Component {
       pathname: "/warehouse",
       state: {
         name: r[0],
+        id:r[4]
       },
     });
   };

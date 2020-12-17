@@ -43,6 +43,7 @@ class Warehouse extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      listOfSensors_withHistory:[],
       warehouseId: this.props.location.state
         ? this.props.location.state.warehouseId
         : null,
@@ -75,24 +76,49 @@ class Warehouse extends React.Component {
   }
 
   componentDidMount() {
-    // console.log(this.props.location.state.warehouseId);
-    console.log(this.state.warehouseId);
-    // customerJson[0].warehouses[0].sensor.forEach((d) => {
-    //   let tmp = [];
-    //   let cnt = 1;
-    //   d.history.forEach((hist) => {
-    //     if (tmp.length <= 5) {
-    //       tmp.push(hist);
-    //     } else {
+    console.log("PROPSSS:", this.props)
+    if(((this.props.location.state||{}).name||"").length !== 0){
+      localStorage.setItem("warehouse_name", (this.props.location.state||{}).name||"")
+    }
+    if(((this.props.location.state||{}).id||"").length !== 0){
+      localStorage.setItem("warehouse_id", (this.props.location.state||{}).id||"")
+    }
+    this.getListOfSensorsInAWarehouse(localStorage.getItem("warehouse_id"))
+  }
 
-    //     }
-    //     console.log(hist);
-    //   });
-    //   console.log(d);
-    // })
+  getSensorHistoryForSensor = (sensors)=>{
+    console.log("Inside getSensorHistoryForSensor!");
+    sensors.map((s)=>{
+      axios
+        .get(`http://localhost:3001/sensor/${s.sensor_id}/history`)
+        .then((res) => {
+          let sensor_withHistory = s
+          sensor_withHistory.history = res.data
+          let list = this.state.listOfSensors_withHistory
+          list.push(sensor_withHistory)
+          this.setState({
+            listOfSensors_withHistory:list
+          })
+        })
+        .catch((err) => {
+          console.log("error in getting all users from mysql: ",err);
+        });
+    })
+  }
 
-    // make call to grab all sensor data from the selected warehouse
-    // default detailed warehouse is first on the list
+  getListOfSensorsInAWarehouse = (warehouse_id) =>{
+    console.log("Inside getListOfSensorsInAWarehouse!");
+    axios
+        .get(`http://localhost:3001/warehouse/${warehouse_id}/sensors`)
+        .then((res) => {
+          this.setState({
+            sensors: res.data.sensors
+          })
+          this.getSensorHistoryForSensor(res.data.sensors)
+        })
+        .catch((err) => {
+          console.log("error in getting all users from mysql: ",err);
+        });
   }
 
   orderTablePagination(index) {
@@ -263,28 +289,31 @@ class Warehouse extends React.Component {
           </Col>
         </Row>
         <Row>
-          {customerJson[0].warehouses[0].sensor.map((sen, index) => {
+        {this.state.listOfSensors_withHistory.map((sen, index) => {
             let header = [];
             let range = [0, 100];
-            if (sen.type === "temperature") {
+            if (sen.sensor_type === "temperature") {
               header = ["Time", "Temperature"];
-            } else if (sen.type === "uv") {
-              header = ["Time", "Lux"];
+            } else if (sen.sensor_type === "uv") {
+              header = ["Time", "UV Index"];
               range = [0, 10];
-            } else if (sen.type === "humidity") {
-              header = ["Time", "Relative Humidity"];
+            } else if (sen.sensor_type === "humidity") {
+              header = ["Time", "Concentration"];
             }
 
             const chart_data = [];
             const history_data = [];
-            sen.history.forEach((dt) => {
+            ((sen.history||{}).sensor_history||[]).forEach((data) => {
+              console.log(data);
+            let dateTime = new Date(data.dateTime)
+            let dt = [dateTime.toString(), data.value]
               if (history_data.length < 6) {
                 history_data.push(dt);
               }
               let tmp = { name: "", generic: "" };
-              let x = dt[0].split("-");
-              tmp.name = x[1];
-              tmp.generic = dt[1];
+              let x = dt[0].split(" ");
+              tmp.name = x[4];      //time
+              tmp.generic = dt[1];  //value
               chart_data.push(tmp);
             });
 
@@ -294,7 +323,7 @@ class Warehouse extends React.Component {
               <Col className="pb-4" xs="auto" md="4">
                 <Card width="100%">
                   <CardBody>
-                    <CardTitle tag="h5">{sen.name}</CardTitle>
+                    <CardTitle tag="h5">{sen.sensor_type} sensor</CardTitle>
                     <ResponsiveContainer width="100%" height={300}>
                       <LineChart data={chart_data}>
                         <Line
