@@ -58,7 +58,11 @@ class SupportWarehouse extends React.Component {
       manageSensorModal: false,
       deleteToggle: false,
       orderModal: false,
-      deletedSensor: ''
+      deletedSensor: '',
+      manageSensor: {
+        status: "active"
+      },
+      manageId: ""
     };
   }
 
@@ -133,16 +137,48 @@ class SupportWarehouse extends React.Component {
     });
   };
 
-  manageSensorToggle = () => {
+  manageSensorToggle = (e, sen) => {
     this.setState({
       manageSensorModal: !this.state.manageSensorModal,
     });
+    if (sen !== null) {
+      this.setState({
+        manageId: sen.sensor_id
+      })
+    }
   };
+
+  manageSensorChange = (e) => {
+    let manage = this.state.manageSensor;
+    manage.status = e.target.value;
+    this.setState({
+      manageSensor: manage
+    });
+  }
+
   manageOrderToggle = () => {
     this.setState({
       manageOrderModal: !this.state.manageOrderModal,
     });
   };
+
+  manageIndividualSensor = (e) => {
+    e.preventDefault();
+    console.log("managing sensors..");
+    console.log(this.state.manageId, this.state.manageSensor.status);
+    
+    let sensor = this.state.addSensor;
+    axios.post(url + "/updatesensorstatus", {
+      sensorID: this.state.manageId,
+      status: this.state.manageSensor.status
+    }).then((response) => {
+      console.log(response);
+      this.manageSensorToggle(e, null);
+    }).catch((error) => {
+      console.log(error);
+      this.manageSensorToggle(e, null);
+    });
+  }
 
   grabAllSensor() {
     // call individual warehouse for all sensors
@@ -165,23 +201,30 @@ class SupportWarehouse extends React.Component {
   };
 
   deleteSensor = (e) => {
+    console.log(this.state.deletedSensor);
     axios.post(url + "/delete", {
       sensorId: this.state.deletedSensor
     }).then((response) => {
       console.log(response);
-      this.deleteSensorToggle(e, null);
+      this.deleteSensorToggle();
     }).catch((error) => {
       console.log(error);
-      this.deleteSensorToggle(e, null);
+      this.deleteSensorToggle();
     })
   }
 
-  deleteSensorToggle = (e, sensor) => {
+  deleteSensorToggle = () => {
     this.setState({
-      deleteToggle: !this.state.deleteToggle,
-      deleteSensor: sensor ? sensor.id : ''
+      deleteToggle: !this.state.deleteToggle
     });
   };
+
+  deleteSensorSelected = (sensor) => {
+    this.setState({
+      deletedSensor: sensor ? sensor.sensor_id : ''
+    });
+    this.deleteSensorToggle();
+  }
 
   orderTablePagination(index) {
     // organize order table pagination
@@ -288,10 +331,10 @@ class SupportWarehouse extends React.Component {
                         <PaginationLink last />
                       </PaginationItem>
                     </Pagination>
-                    <Button color="primary" onClick={this.manageSensorToggle}>
+                    <Button color="primary" onClick={e => this.manageSensorToggle(e, sen)}>
                       Manage Sensor
                     </Button>{" "}
-                    <Button color="danger" onClick={this.deleteSensorToggle}>
+                    <Button color="danger" onClick={e => this.deleteSensorSelected(sen)}>
                       Delete
                     </Button>
                   </CardBody>
@@ -304,8 +347,7 @@ class SupportWarehouse extends React.Component {
         <Modal isOpen={this.state.addSensorModal} toggle={this.addSensorToggle}>
           <ModalHeader toggle={this.addSensorToggle}>Add Sensor</ModalHeader>
           <ModalBody>
-            <Form 
-              onChange={this.handleAddSensorChange} 
+            <Form
               onSubmit={this.addSensorSubmit}>
               <FormGroup>
                 <Label for="exampleEmail">Sensor Name</Label>
@@ -323,7 +365,7 @@ class SupportWarehouse extends React.Component {
                   placeholder="Second Floor"
                 />
               </FormGroup>
-              <FormGroup>
+              <FormGroup onChange={this.handleAddSensorChange} >
                 <Label for="exampleSelect">Sensor Type</Label>
                 <Input
                   type="select"
@@ -366,51 +408,29 @@ class SupportWarehouse extends React.Component {
 
         <Modal
           isOpen={this.state.manageSensorModal}
-          toggle={this.manageSensorToggle}
+          toggle={e => this.manageSensorToggle(e, null)}
         >
-          <ModalHeader toggle={this.manageSensorToggle}>
+          <ModalHeader toggle={e => this.manageSensorToggle(e, null)}>
             Manage Sensor
           </ModalHeader>
           <ModalBody>
-            <Form onSubmit={this.manageIndividualSensor}>
-              <FormGroup>
-                <Label for="exampleEmail">Sensor Name</Label>
-                <Input
-                  name="email"
-                  id="exampleEmail"
-                  placeholder="Sensor #1"
-                />
-              </FormGroup>
-              <FormGroup>
-                <Label for="examplePassword">Location</Label>
-                <Input
-                  type="password"
-                  name="password"
-                  id="examplePassword"
-                  placeholder="Second Floor"
-                />
-              </FormGroup>
-              <FormGroup>
-                <Label for="exampleSelect">Sensor Type</Label>
-                <Input type="select" name="select">
-                  <option value="temperature">Temperature</option>
-                  <option value="humidity">Humidity</option>
-                  <option value="uv">Light</option>
-                </Input>
-              </FormGroup>
+            <Form 
+              onSubmit={this.manageIndividualSensor}
+              onChange={this.manageSensorChange}
+              >
               <FormGroup>
                 <Label for="exampleSelect">Action</Label>
                 <Input type="select" name="select">
-                  <option value="on">Turn On</option>
-                  <option value="off">Turn Off</option>
-                  <option value="maintain">Maintenance</option>
+                  <option value="active">Turn On</option>
+                  <option value="inactive">Turn Off</option>
+                  <option value="maintenance">Maintenance</option>
                 </Input>
               </FormGroup>
               <ModalFooter>
                 <Button color="primary" type="submit">
                   Update
                 </Button>{" "}
-                <Button color="danger" onClick={this.manageSensorToggle}>
+                <Button color="danger" onClick={e => this.manageSensorToggle(e, null)}>
                   Cancel
                 </Button>
               </ModalFooter>
@@ -420,9 +440,9 @@ class SupportWarehouse extends React.Component {
 
         <Modal
           isOpen={this.state.deleteToggle}
-          toggle={(e) => this.deleteSensorToggle(e, null)}
+          toggle={this.deleteSensorToggle}
         >
-          <ModalHeader toggle={(e) => this.deleteSensorToggle(e, null)}>
+          <ModalHeader toggle={this.deleteSensorToggle}>
             Are you sure?
           </ModalHeader>
           <ModalBody>
@@ -432,7 +452,7 @@ class SupportWarehouse extends React.Component {
             <Button color="primary" onClick={e => this.deleteSensor(e)}>
               Continue
             </Button>{" "}
-            <Button color="danger" onClick={(e) => this.deleteSensorToggle(e, null)}>
+            <Button color="danger" onClick={this.deleteSensorToggle}>
               Cancel
             </Button>
           </ModalFooter>
