@@ -195,17 +195,20 @@ app.post('/addsensor', function(req, res){
 
 		var newSensorID = generateID(6);
 
-		if (addSensorRequest.sensortype == "light") {
+		var UpperCaseSensor = addSensorRequest.sensortype;
+		UpperCaseSensor = UpperCaseSensor.toUpperCase();
+
+		if (UpperCaseSensor == "LIGHT") {
 
 			ArrayOfSmartNodes[ind].sensorList.push(new SensorClass.LightSensor(newSensorID));
 			var sensorJSON = {"sensor_id": newSensorID, "sensor_type": addSensorRequest.sensortype, "sensor_unit": "Lux", "warehouse_id": addSensorRequest.warehouseID, "sensor_status": "Active"};
 
-		} else if (addSensorRequest.sensortype == "temperature") {
+		} else if (UpperCaseSensor == "TEMPERATURE") {
 
 			ArrayOfSmartNodes[ind].sensorList.push(new SensorClass.TemperatureSensor(newSensorID));
 			var sensorJSON = {"sensor_id": newSensorID, "sensor_type": addSensorRequest.sensortype, "sensor_unit": "Fahrenheit", "warehouse_id": addSensorRequest.warehouseID, "sensor_status": "Active"};
 
-		} else if (addSensorRequest.sensortype == "humidity") {
+		} else if (UpperCaseSensor == "HUMIDITY") {
 
 			ArrayOfSmartNodes[ind].sensorList.push(new SensorClass.HumiditySensor(newSensorID));
 			var sensorJSON = {"sensor_id": newSensorID, "sensor_type": addSensorRequest.sensortype, "sensor_unit": "RH (%)", "warehouse_id": addSensorRequest.warehouseID, "sensor_status": "Active"};
