@@ -122,7 +122,7 @@ class SupportWarehouse extends React.Component {
     
     let sensor = this.state.addSensor;
     axios.post(url + "/addsensor", {
-      warehouseID: this.state.warehouseId,
+      warehouseID: localStorage.getItem("warehouse_id"),
       sensortype: sensor.sensorType
     }).then((response) => {
       console.log(response);
@@ -310,7 +310,6 @@ class SupportWarehouse extends React.Component {
               <FormGroup>
                 <Label for="exampleEmail">Sensor Name</Label>
                 <Input
-                  type="email"
                   name="email"
                   id="exampleEmail"
                   placeholder="Sensor #1"
@@ -319,7 +318,6 @@ class SupportWarehouse extends React.Component {
               <FormGroup>
                 <Label for="examplePassword">Location</Label>
                 <Input
-                  type="password"
                   name="password"
                   id="examplePassword"
                   placeholder="Second Floor"
@@ -335,7 +333,7 @@ class SupportWarehouse extends React.Component {
                 >
                   <option value="temperature">Temperature</option>
                   <option value="humidity">Humidity</option>
-                  <option value="uv">Light</option>
+                  <option value="LIGHT">Light</option>
                 </Input>
               </FormGroup>
               {this.state.addSensor.sensorType === "temperature" ? (
@@ -378,7 +376,6 @@ class SupportWarehouse extends React.Component {
               <FormGroup>
                 <Label for="exampleEmail">Sensor Name</Label>
                 <Input
-                  type="email"
                   name="email"
                   id="exampleEmail"
                   placeholder="Sensor #1"
