@@ -39,15 +39,15 @@ class Register extends React.Component {
       role:this.state.role
     }
     console.log(data);
-    // axios
-    // .post(`http://localhost:3001/register`, data)
-    // .then((res) => {
-    //   console.log("redirect...");
-    //   this.props.history.push("/login");
-    // })
-    // .catch((err) => {
-    //   console.log("error while tryign to register the user. Try again!: ",err);
-    // });
+    axios
+    .post(`http://localhost:3001/register`, data)
+    .then((res) => {
+      console.log("redirect...");
+      this.props.history.push("/login");
+    })
+    .catch((err) => {
+      console.log("error while tryign to register the user. Try again!: ",err);
+    });
   };
   render() {
     return (
