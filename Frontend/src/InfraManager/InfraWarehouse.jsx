@@ -32,6 +32,8 @@ import { Link } from "react-router-dom";
 import customerJson from "../mock_data/customer.js";
 import axios from 'axios';
 
+const url = "http://127.0.0.1:4000";
+
 class SupportWarehouse extends React.Component {
   constructor(props) {
     super(props);
@@ -55,7 +57,8 @@ class SupportWarehouse extends React.Component {
       individualSensorId: null,
       manageSensorModal: false,
       deleteToggle: false,
-      orderModal: false
+      orderModal: false,
+      deletedSensor: ''
     };
   }
 
@@ -115,6 +118,19 @@ class SupportWarehouse extends React.Component {
     // add sensor
     e.preventDefault();
     console.log("Adding sensors..");
+    console.log(this.state.addSensor);
+    
+    let sensor = this.state.addSensor;
+    axios.post(url + "/addsensor", {
+      warehouseID: this.state.warehouseId,
+      sensortype: sensor.sensorType
+    }).then((response) => {
+      console.log(response);
+      this.addSensorToggle(e);
+    }).catch((error) => {
+      console.log(error);
+      this.addSensorToggle(e);
+    });
   };
 
   manageSensorToggle = () => {
@@ -148,16 +164,23 @@ class SupportWarehouse extends React.Component {
     });
   };
 
-  deleteSensorToggle = () => {
+  deleteSensor = (e) => {
+    axios.post(url + "/delete", {
+      sensorId: this.state.deletedSensor
+    }).then((response) => {
+      console.log(response);
+      this.deleteSensorToggle(e, null);
+    }).catch((error) => {
+      console.log(error);
+      this.deleteSensorToggle(e, null);
+    })
+  }
+
+  deleteSensorToggle = (e, sensor) => {
     this.setState({
       deleteToggle: !this.state.deleteToggle,
+      deleteSensor: sensor ? sensor.id : ''
     });
-  };
-
-  handleDelete = (e) => {
-    e.preventDefault();
-    // handle delete action
-    this.deleteSensorToggle();
   };
 
   orderTablePagination(index) {
@@ -281,7 +304,9 @@ class SupportWarehouse extends React.Component {
         <Modal isOpen={this.state.addSensorModal} toggle={this.addSensorToggle}>
           <ModalHeader toggle={this.addSensorToggle}>Add Sensor</ModalHeader>
           <ModalBody>
-            <Form onSubmit={this.addSensorSubmit}>
+            <Form 
+              onChange={this.handleAddSensorChange} 
+              onSubmit={this.addSensorSubmit}>
               <FormGroup>
                 <Label for="exampleEmail">Sensor Name</Label>
                 <Input
@@ -307,7 +332,6 @@ class SupportWarehouse extends React.Component {
                   name="select"
                   id="exampleSelect"
                   value={this.state.addSensor.sensorType}
-                  onChange={this.handleAddSensorChange}
                 >
                   <option value="temperature">Temperature</option>
                   <option value="humidity">Humidity</option>
@@ -331,7 +355,6 @@ class SupportWarehouse extends React.Component {
                 <Button
                   color="primary"
                   type="submit"
-                  onClick={this.addSensorToggle}
                 >
                   Submit
                 </Button>{" "}
@@ -400,19 +423,19 @@ class SupportWarehouse extends React.Component {
 
         <Modal
           isOpen={this.state.deleteToggle}
-          toggle={this.deleteSensorToggle}
+          toggle={(e) => this.deleteSensorToggle(e, null)}
         >
-          <ModalHeader toggle={this.deleteSensorToggle}>
+          <ModalHeader toggle={(e) => this.deleteSensorToggle(e, null)}>
             Are you sure?
           </ModalHeader>
           <ModalBody>
             <p>Deleting sensor will remove it from the network.</p>
           </ModalBody>
           <ModalFooter>
-            <Button color="primary" onClick={this.handleDelete}>
+            <Button color="primary" onClick={e => this.deleteSensor(e)}>
               Continue
             </Button>{" "}
-            <Button color="danger" onClick={this.deleteSensorToggle}>
+            <Button color="danger" onClick={(e) => this.deleteSensorToggle(e, null)}>
               Cancel
             </Button>
           </ModalFooter>
