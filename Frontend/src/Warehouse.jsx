@@ -151,7 +151,7 @@ class Warehouse extends React.Component {
 
   addSensorSubmit = (e) => {
     // add sensor
-    e.preventDefault();
+    // e.preventDefault();
     console.log("Adding sensors..");
     console.log(this.state.addSensor);
     
@@ -209,7 +209,7 @@ class Warehouse extends React.Component {
   }
 
   manageIndividualSensor = (e) => {
-    e.preventDefault();
+    // e.preventDefault();
     console.log("managing sensors..");    
     let sensor = this.state.addSensor;
     axios.post(derek_backend_url + "/updatesensorstatus", {
