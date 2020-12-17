@@ -56,7 +56,8 @@ class SupportWarehouse extends React.Component {
       individualSensorId: null,
       manageSensorModal: false,
       deleteToggle: false,
-      orderModal: false
+      orderModal: false,
+      deletedSensor: ''
     };
   }
 
