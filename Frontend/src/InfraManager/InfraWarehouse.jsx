@@ -118,7 +118,7 @@ class InfraWarehouse extends React.Component {
 
   addSensorSubmit = (e) => {
     // add sensor
-    e.preventDefault();
+    // e.preventDefault();
     console.log("Adding sensors..");
     console.log(this.state.addSensor);
     
@@ -162,7 +162,7 @@ class InfraWarehouse extends React.Component {
   };
 
   manageIndividualSensor = (e) => {
-    e.preventDefault();
+    // e.preventDefault();
     console.log("managing sensors..");
     console.log(this.state.manageId, this.state.manageSensor.status);
     
