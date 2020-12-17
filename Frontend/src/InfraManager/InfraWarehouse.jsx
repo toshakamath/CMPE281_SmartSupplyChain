@@ -58,7 +58,7 @@ class InfraWarehouse extends React.Component {
       orderModal: false,
       deletedSensor: '',
       manageSensor: {
-        status: "active"
+        status: "Active"
       },
       manageId: ""
     };

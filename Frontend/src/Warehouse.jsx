@@ -72,7 +72,7 @@ class Warehouse extends React.Component {
       warehouse: [],
       deletedSensor: '',
       manageSensor: {
-        status: "active"
+        status: "Active"
       },
       manageId: ""
     };
