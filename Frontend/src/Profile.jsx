@@ -106,6 +106,9 @@ class Profile extends React.Component {
 
   handleChange = (e) => {
     console.log(e.target);
+    this.setState({
+      [e.target.name]: e.target.value
+    });
   };
 
   expenseToggle = () => {
