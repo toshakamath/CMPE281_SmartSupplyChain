@@ -311,12 +311,12 @@ class InfraDashboard extends React.Component {
                                 {
                                     this.state.markerData.map(
                                         (obj, index) => {
-                                            let lat = parseFloat((obj.location||{}).lat||"", 10);
-                                            let lng = parseFloat((obj.location||{}).lng||"", 10);
+                                            let lat = parseFloat(obj.latitude||"", 10);
+                                            let lng = parseFloat(obj.longitude||"", 10);
                                             return(
                                                 <Marker
                                                     key={index}
-                                                    name={`${obj.name}-${obj.status}-${obj.customer}`}
+                                                    name={`${obj.name}-${obj.warehouse_status}-${obj.owner}`}
                                                     onClick={this.onMarkerClick}
                                                     position={{
                                                         lat: lat,
@@ -345,7 +345,7 @@ class InfraDashboard extends React.Component {
                                                             }
                                                             <Col>
                                                                 <Badge 
-                                                                    color={this.state.selectedMarkerInfo.status.toLowerCase() === "operational" ? 
+                                                                    color={this.state.selectedMarkerInfo.status.toLowerCase() === "active" ? 
                                                                     "success" : "danger"}>
                                                                     {this.state.selectedMarkerInfo.status}
                                                                 </Badge>
