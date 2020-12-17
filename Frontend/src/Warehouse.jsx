@@ -169,10 +169,15 @@ class Warehouse extends React.Component {
     });
   };
 
-  manageSensorToggle = () => {
+  manageSensorToggle = (e, sen) => {
     this.setState({
       manageSensorModal: !this.state.manageSensorModal,
     });
+    if (sen !== null) {
+      this.setState({
+        manageId: sen.sensor_id
+      })
+    }
   };
 
   grabAllSensor() {
@@ -547,9 +552,9 @@ class Warehouse extends React.Component {
               <FormGroup>
                 <Label for="exampleSelect">Action</Label>
                 <Input type="select" name="select">
-                  <option value="on">Turn On</option>
-                  <option value="off">Turn Off</option>
-                  <option value="maintain">Maintenance</option>
+                  <option value="Active">Turn On</option>
+                  <option value="Inactive">Turn Off</option>
+                  <option value="Maintenance">Maintenance</option>
                 </Input>
               </FormGroup>
               <ModalFooter>
