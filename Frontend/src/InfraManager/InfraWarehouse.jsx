@@ -209,7 +209,7 @@ class SupportWarehouse extends React.Component {
       <Container className="pb-5" fluid={true}>
         <Row className="justify-content-md-center pt-4 pb-4">
           <Col md="2">
-            <h2>{localStorage.getItem("warehouse_name")} : {localStorage.getItem("warehouse_id")}</h2>
+            <h2>{localStorage.getItem("warehouse_name")}</h2>
           </Col>
           <Col md="2">
             <Button color="primary" onClick={this.addSensorToggle}>
@@ -268,7 +268,7 @@ class SupportWarehouse extends React.Component {
                       </LineChart>
                     </ResponsiveContainer>
                     <CustomTable
-                      title={"History"+" : "+sensor_id}
+                      title={"Sensor History"}
                       header={header}
                       trows={history_data}
                       handleRowClick={this.handleRowClick}
