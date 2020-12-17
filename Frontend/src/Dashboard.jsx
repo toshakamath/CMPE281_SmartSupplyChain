@@ -201,7 +201,6 @@ class Dashboard extends React.Component {
         city: form.city,
         longitude: form.lng,
         latitude: form.lat,
-        cargoamount: 30,
         schedule: form.schedule * 1000,
         email: localStorage.getItem("email")
       })
