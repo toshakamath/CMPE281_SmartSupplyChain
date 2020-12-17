@@ -1,0 +1,5 @@
+starting the various components
+
+for tosha's backend: node index.js
+for derek's backend: node server.js
+for eric's frontend: npm start
