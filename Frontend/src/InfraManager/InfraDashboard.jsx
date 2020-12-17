@@ -77,7 +77,7 @@ class InfraDashboard extends React.Component {
     }
 
     addWarehouseSubmit = (e) => {
-        e.preventDefault();
+        // e.preventDefault();
         let form = this.state.addWarehouseForm;
         console.log(this.state.addWarehouseForm);
         axios
@@ -93,6 +93,7 @@ class InfraDashboard extends React.Component {
           })
           .then((response) => {
             console.log(response);
+            this.getAllWarehouses();
             this.modalToggle(e);
           })
           .catch((error) => {
@@ -175,6 +176,11 @@ class InfraDashboard extends React.Component {
       })
       .catch((err) => {
         console.log("error in getting all users from mysql: ", err);
+        this.setState({
+            isCustomerView: !this.state.isCustomerView,
+            selectedCustomer: r[0],
+            selectedCustEmail: r[2]
+        });
       });
   }
 
@@ -242,7 +248,7 @@ class InfraDashboard extends React.Component {
         let form = this.state.addWarehouseForm;
         form[e.target.name] = e.target.value;
         this.setState({
-        addWarehouseForm: form,
+            addWarehouseForm: form,
         });
     };
 
@@ -253,6 +259,7 @@ class InfraDashboard extends React.Component {
       };
 
     deleteWarehouseSubmit = (e) => {
+        // e.preventDefault();
         // delete warehouse from the network for the specific customer
         axios
           .post(url + "/removewarehouse", {
@@ -260,6 +267,7 @@ class InfraDashboard extends React.Component {
           })
           .then((response) => {
             console.log(response);
+            this.getAllWarehouses();
             this.deleteToggle(e);
           })
           .catch((error) => {
@@ -303,12 +311,12 @@ class InfraDashboard extends React.Component {
                                 {
                                     this.state.markerData.map(
                                         (obj, index) => {
-                                            let lat = parseFloat((obj.location||{}).lat||"", 10);
-                                            let lng = parseFloat((obj.location||{}).lng||"", 10);
+                                            let lat = parseFloat(obj.latitude||"", 10);
+                                            let lng = parseFloat(obj.longitude||"", 10);
                                             return(
                                                 <Marker
                                                     key={index}
-                                                    name={`${obj.name}-${obj.status}-${obj.customer}`}
+                                                    name={`${obj.name}-${obj.warehouse_status}-${obj.owner}`}
                                                     onClick={this.onMarkerClick}
                                                     position={{
                                                         lat: lat,
@@ -337,7 +345,7 @@ class InfraDashboard extends React.Component {
                                                             }
                                                             <Col>
                                                                 <Badge 
-                                                                    color={this.state.selectedMarkerInfo.status.toLowerCase() === "operational" ? 
+                                                                    color={this.state.selectedMarkerInfo.status.toLowerCase() === "active" ? 
                                                                     "success" : "danger"}>
                                                                     {this.state.selectedMarkerInfo.status}
                                                                 </Badge>
@@ -422,10 +430,10 @@ class InfraDashboard extends React.Component {
                                 onSubmit={this.deleteWarehouseSubmit}>
                                 <FormGroup>
                                     <Label for="exampleEmail">Warehouse Name</Label>
-                                    <Input type="select" name="warehouse_delete">
+                                    <Input type="select" name="deleteWarehouse">
                                         {
                                             this.state.table_data.map((ware) => {
-                                                return(<option value={ware[0]}>{ware[0]}</option>);
+                                                return(<option value={ware[3]}>{ware[0]}</option>);
                                             })
                                         }
                                     </Input>

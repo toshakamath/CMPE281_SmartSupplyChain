@@ -130,6 +130,7 @@ class SupportWarehouse extends React.Component {
       sensortype: sensor.sensorType
     }).then((response) => {
       console.log(response);
+      this.getListOfSensorsInAWarehouse(localStorage.getItem("warehouse_id"));
       this.addSensorToggle(e);
     }).catch((error) => {
       console.log(error);
@@ -173,6 +174,7 @@ class SupportWarehouse extends React.Component {
       status: this.state.manageSensor.status
     }).then((response) => {
       console.log(response);
+      this.getListOfSensorsInAWarehouse(localStorage.getItem("warehouse_id"));
       this.manageSensorToggle(e, null);
     }).catch((error) => {
       console.log(error);
