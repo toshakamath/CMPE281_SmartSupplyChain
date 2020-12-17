@@ -443,7 +443,7 @@ class InfraDashboard extends React.Component {
                                 onSubmit={this.addWarehouseSubmit}>
                                 <FormGroup>
                                     <Label for="exampleEmail">Warehouse Name</Label>
-                                    <Input type="email" name="email" id="exampleEmail" placeholder="Name here..." />
+                                    <Input name="email" id="exampleEmail" placeholder="Name here..." />
                                 </FormGroup>
                                 <FormGroup>
                                     <Label>Address</Label>
@@ -490,10 +490,6 @@ class InfraDashboard extends React.Component {
                                 </ModalFooter>
                             </Form>
                         </ModalBody>
-                        <ModalFooter>
-                            <Button color="primary" type="submit">Add</Button>{' '}
-                            <Button color="danger" onClick={this.modalToggle}>Cancel</Button>
-                        </ModalFooter>
                     </Modal>
                 </div>
         );
